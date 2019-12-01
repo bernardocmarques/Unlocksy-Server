@@ -1,3 +1,5 @@
+import base64
+
 import Crypto.Random
 from Crypto.Cipher import AES
 import math
@@ -6,16 +8,26 @@ import math
 class AESClass:
 
     def __init__(self):
-        self.key = Crypto.Random.get_random_bytes(16)
+        self.key = Crypto.Random.get_random_bytes(32)
 
     def encrypt(self, data):
         iv = Crypto.Random.get_random_bytes(16)
         cipher = AES.new(self.key, AES.MODE_CBC, iv)
-        return cipher.encrypt(_pad(data, AES.block_size)), iv
+        encrypted_data = base64.b64encode(cipher.encrypt(_pad(data, AES.block_size))).decode()
 
-    def decrypt(self, data_enc):
-        decipher = AES.new(key, AES.MODE_CBC, IV)
+        encrypted_data += " " + base64.b64encode(iv).decode()
+
+        return encrypted_data
+
+    def decrypt(self, data_enc_base64, iv_base64):
+        iv = base64.b64decode(iv_base64)
+        data_enc = base64.b64decode(data_enc_base64)
+
+        decipher = AES.new(self.key, AES.MODE_CBC, iv)
         return _unpad(decipher.decrypt(data_enc)).decode()
+
+    def set_key_base64(self, key_base64):
+        self.key = base64.b64decode(key_base64)
 
 
 def _pad(text, block_size):

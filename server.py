@@ -1,5 +1,7 @@
 from bluetooth import *
-from RSA import *
+from AES_M import *
+import threading
+import time
 
 # rsa = RSAClass()
 #
@@ -7,40 +9,72 @@ from RSA import *
 # input("Enter to continue...")
 # pubKeyClient = import_public_key_from_file("pubkey_client.pem")
 
-name = "BluetoothChat"
-uuid = "fa87c0d0-afac-11de-8a39-0800200c9a66"
+aes = AESClass()
 
-server_socket = BluetoothSocket(RFCOMM)
 
-port = PORT_ANY
+def listen_socket():
+    listening = True
+    while listening:
+        try:
+            data = client_socket.recv(2048).decode()
+            msg, iv = data.split(" ")
+            cmd = aes.decrypt(msg, iv)
+            execute_cmd(cmd)
+        except BluetoothError:
+            listening = False
+        except KeyboardInterrupt:
+            listening = False
+    print("Stop listening\n")
 
-server_socket.bind(("", port))
-print("Listening for connections on port: ", port)
-print("Server Running. Press Ctrl+Z to close.")
-server_socket.listen(1)
-port = server_socket.getsockname()[1]
 
-advertise_service(server_socket, name, uuid)
-try:
-    client_socket, address = server_socket.accept()
-except KeyboardInterrupt:
-    exit()
+def execute_cmd(cmd):
+    print(cmd.lower())
+    cmd_splited = cmd.split(" ")
+    cmd = cmd_splited[0]
+    args = cmd_splited[1:]
 
-# noinspection PyUnboundLocalVariable
-print("Connected to", address)
+def create_server():
+    server_socket = BluetoothSocket(RFCOMM)
 
-closed = False
-while not closed:
+    name = "BluetoothChat"
+    uuid = "fa87c0d0-afac-11de-8a39-0800200c9a66"
+    client_sock = address = None
+
+    port = PORT_ANY
+
+    server_socket.bind(("", port))
+    print("Listening for connections on port: ", port)
+    print("Server Running. Press Ctrl+Z to close.")
+    server_socket.listen(1)
+
+    advertise_service(server_socket, name, uuid)
     try:
-        # noinspection PyUnboundLocalVariable
-        data = client_socket.recv(2048)
-        print(">>>", data.decode())
-        client_socket.send(input(">>>").encode())
-
-
-        # print(">>>", rsa.remove_signature_and_decrypt(data, pubKeyClient))
+        client_sock, address = server_socket.accept()
     except KeyboardInterrupt:
-        closed = True
+        exit()
+
+    print("Connected to", address)
+    key = client_sock.recv(2048).decode()
+    aes.set_key_base64(key)
+    print(key)
+    return server_socket, client_sock, address
+
+
+server_socket, client_socket, _ = create_server()
+server_closed = False
+
+while not server_closed:
+    receiving_thread = threading.Thread(target=listen_socket)
+    receiving_thread.start()
+    try:
+        client_socket.send(aes.encrypt(input()).encode())
+    except BluetoothError:
+        client_socket.close()
+        server_socket.close()
+        print("Connection Closed\n\n")
+        server_socket, client_socket, _ = create_server()
+    except KeyboardInterrupt:
+        server_closed = True
 
 print("Closing Server")
 client_socket.close()
