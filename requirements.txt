@@ -1,5 +1,5 @@
 # sudo apt-get install bluetooth libbluetooth-dev
-# sudo apt install bluezc
+# sudo apt install bluez
 
 
 '''modifying /etc/systemd/system/dbus-org.bluez.service,
