@@ -1,4 +1,4 @@
-from RSA import *
+from RSA_Util import *
 
 rsa = RSAClass()
 

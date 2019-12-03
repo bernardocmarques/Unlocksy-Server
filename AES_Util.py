@@ -5,7 +5,7 @@ from Crypto.Cipher import AES
 import math
 
 
-class AESClass:
+class AES_Util:
 
     def __init__(self):
         self.key = Crypto.Random.get_random_bytes(32)
@@ -22,7 +22,6 @@ class AESClass:
     def decrypt(self, data_enc_base64, iv_base64):
         iv = base64.b64decode(iv_base64)
         data_enc = base64.b64decode(data_enc_base64)
-
         decipher = AES.new(self.key, AES.MODE_CBC, iv)
         return _unpad(decipher.decrypt(data_enc)).decode()
 
