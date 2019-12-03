@@ -1,0 +1,22 @@
+# sudo apt-get install bluetooth libbluetooth-dev
+# sudo apt install bluezc
+
+
+'''modifying /etc/systemd/system/dbus-org.bluez.service,
+
+changing
+
+ExecStart=/usr/lib/bluetooth/bluetoothd
+
+into
+
+ExecStart=/usr/lib/bluetooth/bluetoothd -C
+
+Then adding the Serial Port Profile, executing: sudo sdptool add SP
+'''
+
+pybluez
+pycrypto
+
+flask
+flask_qrcode
