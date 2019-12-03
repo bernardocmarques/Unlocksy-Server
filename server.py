@@ -2,15 +2,6 @@ from bluetooth import *
 from AES_Util import *
 import threading
 
-# aes = AES_Util()
-
-
-# def execute_cmd(cmd):
-#     print(cmd.lower())
-#     cmd_splited = cmd.split(" ")
-#     cmd = cmd_splited[0]
-#     args = cmd_splited[1:]
-
 
 class BT_Server:
 
@@ -18,6 +9,7 @@ class BT_Server:
         self.aes = AES_Util()
         self.rsa = rsa
         self.server_socket = self.client_socket = None
+        self.isRunning = False
 
     def create_server(self):
         server_sock = BluetoothSocket(RFCOMM)
@@ -40,15 +32,24 @@ class BT_Server:
             exit()
 
         print("Connected to", address)
-        key = client_sock.recv(2048).decode()
-        self.aes.set_key_base64(self.rsa.decrypt_msg(key))
+        key_enc = client_sock.recv(2048).decode()
+        key = self.rsa.decrypt_msg(key_enc)
+        if key:
+            self.aes.set_key_base64(key)
+        else:
+            print("Could not get key")
+            print("Connection Closed\n\n")
+            client_sock.close()
+            server_sock.close()
+            return self.create_server()
+
         return server_sock, client_sock, address
 
     def run_server(self):
+        self.isRunning = True
         server_socket, client_socket, _ = self.create_server()
-        server_closed = False
 
-        while not server_closed:
+        while self.isRunning:
             try:
                 data = client_socket.recv(2048).decode()
                 msg, iv = data.split(" ")
@@ -60,7 +61,7 @@ class BT_Server:
                 print("Connection Closed\n\n")
                 server_socket, client_socket, _ = self.create_server()
             except KeyboardInterrupt:
-                server_closed = True
+                self.isRunning = False
 
         print("Closing Server")
         client_socket.close()

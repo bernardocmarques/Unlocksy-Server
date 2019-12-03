@@ -30,7 +30,11 @@ class RSA_Util:
     def decrypt_msg(self, encrypted_msg_base64):
         encrypted_msg = base64.b64decode(encrypted_msg_base64)
         cipher = PKCS1_OAEP.new(self.key, hashAlgo=SHA256)
-        return cipher.decrypt(encrypted_msg)
+        try:
+            msg = cipher.decrypt(encrypted_msg)
+        except:
+            return None
+        return msg
 
     def get_public_key_base64(self, mode="DER"):
         return base64.b64encode(self.key.publickey().exportKey(mode)).decode()

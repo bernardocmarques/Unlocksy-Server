@@ -1,3 +1,5 @@
+import threading
+
 from flask import Flask, render_template, request, send_file
 from server import BT_Server
 from flask_qrcode import QRcode
@@ -13,8 +15,17 @@ server = BT_Server(rsa)
 
 @app.route("/")
 def home():
-    server.run_server()
     return "Hello, World!"
+
+
+@app.route("/run")
+def run():
+    print(server.isRunning)
+    if server.isRunning:
+        return "Server already running"
+    else:
+        threading.Thread(target=server.run_server).start()
+        return "server running"
 
 
 def get_mac():
