@@ -48,10 +48,12 @@ def manageFiles():
 def run():
     print(server.isRunning)
     if server.isRunning:
-        return "Server already running"
+        print("Server is already running!")
+
     else:
         threading.Thread(target=server.run_server).start()
-        return "server running"
+
+    return render_template("run-server.html")
 
 
 if __name__ == "__main__":
