@@ -1,0 +1,45 @@
+/* ===================================================================
+   *  Quicksand
+   *
+   * ------------------------------------------------------------------- */
+  
+   @font-face {
+    font-family: "quicksand-bold";
+    src: url("../fonts/Quicksand/Quicksand-Bold.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+  }
+  
+  @font-face {
+    font-family: "quicksand-light";
+    src: url("../fonts/Quicksand/Quicksand-Light.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+  }
+  
+  @font-face {
+    font-family: "quicksand-medium";
+    src: url("../fonts/Quicksand/Quicksand-Medium.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+  }
+  
+  @font-face {
+    font-family: "quicksand-regular";
+    src: url("../fonts/Quicksand/Quicksand-Regular.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+  }
+
+
+  /* ===================================================================
+   *  Pacifico
+   *
+   * ------------------------------------------------------------------- */
+
+   @font-face {
+    font-family: "pacifico";
+    src: url("../fonts/Pacifico/Pacifico-Regular.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+  }

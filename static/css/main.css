@@ -1,0 +1,107 @@
+@import url(fonts.css);
+
+html {
+  font-size: 16px;
+}
+
+@media screen and (min-width: 900px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  html {
+    font-size: 20px;
+  }
+}
+
+body {
+  background-color: #37474F;
+  width: 100%;
+  height: 100%;
+  font-family: 'quicksand-regular', sans-serif;
+}
+
+.logo {
+  font-size: 1.5rem;
+}
+
+.logo i, .logo:hover {
+  color: #5ABA8A;
+}
+
+.logo span, .logo:hover {
+  font-family: 'pacifico', sans-serif;
+  color: #E0E0E0;
+}
+
+.logo:hover {
+  text-decoration: none;
+}
+
+.wrapper {
+  height: calc(100vh - 6rem);
+}
+
+.wrapper .btn {
+  width: calc(100vw/3 - 6rem);
+  font-family: 'quicksand-medium', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.05rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10rem;
+}
+
+@media only screen and (max-width: 768px) {
+  .wrapper .btn {
+    width: calc(100% - 3rem);
+  }
+}
+
+.wrapper .btn-primary {
+  color: #37474F;
+  background-color: #5ABA8A;
+  border-color: #5ABA8A;
+  -webkit-transition: all 300ms ease-in-out;
+  transition: all 300ms ease-in-out;
+}
+
+.wrapper .btn-primary:hover, .wrapper .btn-primary:focus, .wrapper .btn-primary:active {
+  color: #37474F;
+  background-color: #3f976b;
+  border-color: #3f976b;
+  -webkit-transform: translateY(-0.5rem);
+          transform: translateY(-0.5rem);
+}
+
+.wrapper .btn-primary:not(:disabled):not(.disabled).active, .wrapper .btn-primary:not(:disabled):not(.disabled):active, .wrapper .show > .btn-primary.dropdown-toggle {
+  color: #37474F;
+  background-color: #3f976b;
+  border-color: #3f976b;
+  -webkit-transform: translateY(-0.5rem);
+          transform: translateY(-0.5rem);
+}
+
+.wrapper .connected span {
+  font-size: 1.2rem;
+  color: #A0DD7D;
+}
+
+.wrapper .disconnected span {
+  font-size: 1.2rem;
+  color: #CB6F63;
+}
+
+.wrapper .go-back {
+  color: #E0E0E0;
+}
+
+.wrapper .go-back:hover {
+  color: #E0E0E0;
+  text-decoration: none;
+}
+
+.wrapper .go-back span:hover {
+  text-decoration: underline;
+}
