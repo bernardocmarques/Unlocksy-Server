@@ -31,24 +31,27 @@ class BT_Server:
         except KeyboardInterrupt:
             exit()
 
+
         print("Finding connection...")
         nearby_devices = discover_devices(lookup_names=True)
+        print("%d devices found" % len(nearby_devices))
+
         for addr, name in nearby_devices:
-            print("Found %s  (%s)\n" % (name, addr))
+            print("Found %s  (%s)" % (name, addr))
             if addr == address[0]:
                 print("Connected to %s  (%s)\n" % (name, addr))
                 self.deviceName = name
                 break
-            else:
-                print("Connection not found.")
-                print("Closing connection....")
-                client_sock.close()
-                server_sock.close()
-                print("Connection closed.\n\n")
-                return self.create_server()
+
+        if self.deviceName == '':
+            print("Connection not found.\nRestarting...\n")
+            client_sock.close()
+            server_sock.close()
+            return self.create_server()
 
         key_enc = client_sock.recv(2048).decode()
         key = self.rsa.decrypt_msg(key_enc)
+
         if key:
             self.aes.set_key_base64(key)
         else:
