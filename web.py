@@ -12,15 +12,18 @@ qrcode = QRcode(app)
 rsa = RSA_Util()
 server = BT_Server(rsa)
 
+device_name = ''
+device_name_ready = threading.Event()
+
 
 @app.route("/")
 def home():
-    return render_template("index.html", device_name='') #FIXME pass device-name
+    return render_template("index.html", device_name=device_name)
 
 
 @app.route("/manage-devices")
 def manageDevices():
-    return render_template("manage-devices.html", device_name='') #FIXME pass device-name
+    return render_template("manage-devices.html", device_name=device_name)
 
 
 def get_mac():
@@ -32,26 +35,39 @@ def get_mac():
     bt_mac = output.split("{}:".format(device_id))[1].split("BD Address: ")[1].split(" ")[0].strip()
     return bt_mac
 
+
 @app.route("/qr-code", methods=["GET"])
 def qrCode():
     data = get_mac() + "\n"
     data += rsa.get_public_key_base64()
-    return render_template("qr-code.html", qrcode_img=qrcode(data), device_name='') #FIXME pass device-name
+    return render_template("qr-code.html", qrcode_img=qrcode(data), device_name=device_name)
 
 
 @app.route("/manage-files")
 def manageFiles():
-    return render_template("manage-files.html", device_name='') #FIXME pass device-name
+    return render_template("manage-files.html", device_name=device_name)
 
 
 @app.route("/run")
 def run():
     print(server.isRunning)
+    render_template("run-server.html")
+
     if server.isRunning:
         print("Server is already running!")
 
     else:
-        threading.Thread(target=server.run_server).start()
+        thread = threading.Thread(target=server.create_server())
+        thread.start()
+
+        # wait for the device name to be set
+        thread.join()
+
+        global device_name
+        device_name = server.deviceName
+        print("Device name: %s" % device_name)
+
+        threading.Thread(target=server.run_server()).start()
 
     return render_template("run-server.html")
 

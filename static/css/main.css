@@ -45,7 +45,7 @@ body {
 }
 
 .wrapper .btn {
-  width: calc(100vw/3 - 6rem);
+  width: 430px;
   font-family: 'quicksand-medium', sans-serif;
   font-size: 1.5rem;
   letter-spacing: 0.05rem;
@@ -91,6 +91,14 @@ body {
 .wrapper .disconnected span {
   font-size: 1.2rem;
   color: #CB6F63;
+}
+
+.wrapper .qr-code {
+  background-color: white;
+}
+
+.wrapper .qr-code img {
+  height: 22rem;
 }
 
 .wrapper .go-back {
