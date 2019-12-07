@@ -4,7 +4,7 @@ a differenca entre absolute paths e relative esta confusa no files client
 import pytest
 import os
 from config import CONFIG
-from files_client import register_new_directory,lockdown,decrypt_directory,_generate_safe_key,list_directories,_generate_safe_password
+from files_client import register_new_directory,lockdown,decrypt_directory,_generate_safe_key,list_directories,_generate_safe_password,ENCRYPT_PATH
 
 import logging
 import base64
@@ -21,6 +21,7 @@ def setup_folder():
     lockdown()
     CONFIG().reset()
     os.system(f'rm -rf {folder}')
+    os.system(f'rm -rf {ENCRYPT_PATH}')
 
 
 def test_new_folder(setup_folder):
