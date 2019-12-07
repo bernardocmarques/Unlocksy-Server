@@ -17,6 +17,8 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Install bluetooth dependencies and cryfs
+      run: sudo apt-get install bluetooth libbluetooth-dev bluez cryfs
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
