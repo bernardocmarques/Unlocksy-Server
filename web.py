@@ -48,11 +48,7 @@ def manage_files():
 
 
 def run():
-    print(server.isRunning)
-
-    if server.isRunning:
-        print("Server is already running!")
-    else:
+    if not server.isRunning:
         threading.Thread(target=server.run_server).start()
 
 

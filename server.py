@@ -1,9 +1,15 @@
+import time
 from datetime import datetime
+import random
 
 from bluetooth import *
 from AES_Util import *
 import threading
 from BluetoothMessage import BluetoothMessage
+
+
+class Lockdown(Exception):
+    pass
 
 
 class BT_Server:
@@ -33,10 +39,13 @@ class BT_Server:
     def __init__(self, rsa):
         self.aes = AES_Util()
         self.rsa = rsa
-        self.client_socket = None
+        self.server_socket = self.client_socket = None
         self.isRunning = False
+        self.isConnected = False
         self.device_address = ""
         self.device_name = ""
+        self.challenge_answer = None
+        self.isLockdown = False  # fixme queremos isto?
 
     def create_server(self):
         server_sock = BluetoothSocket(RFCOMM)
@@ -77,6 +86,8 @@ class BT_Server:
             self.device_address = ""
             return self.create_server()
 
+        self.isConnected = True
+        threading.Thread(target=self.challenge).start()
         return server_sock, client_sock
 
     def find_device_name(self):
@@ -91,33 +102,64 @@ class BT_Server:
                     self.device_name = name
                     break
 
+    def lockdown(self):
+        print("-----------------------LOCKDOWN-----------------------")
+        self.client_socket.shutdown(2)
+        self.isLockdown = True
+
+    def request_challenge(self, challenge):
+        self.send_cmd("RCA " + str(challenge))
+        print("REQUEST Challenge " + self.device_address)
+
+    def challenge(self):
+        time.sleep(15)
+        nr_try = 0
+        while self.isConnected:
+            self.challenge_answer = None
+            challenge = random.randint(0, 10000000)
+            self.request_challenge(challenge)
+            time.sleep(15)
+            if self.challenge_answer is None or not eval(self.challenge_answer) == challenge + 1:
+                nr_try += 1
+                print("wrong challenge answer (" + str(nr_try) + ")")
+                if nr_try == 3:
+                    self.lockdown()
+                    break
+            else:
+                nr_try = 0
+
     def run_server(self):
         self.isRunning = True
-        server_socket, self.client_socket = self.create_server()
+        self.server_socket, self.client_socket = self.create_server()
 
         while self.isRunning:
             try:
                 print("Waiting for commands...")
                 data = self.client_socket.recv(2048).decode()
+                if self.isLockdown:
+                    self.isLockdown = False
+                    raise Lockdown
                 msg, iv = data.split(" ")
                 cmd = self.aes.decrypt(msg, iv)
                 self.execute_cmd(cmd)
-            except BluetoothError:
+            except (BluetoothError, Lockdown):
+                self.isConnected = False
                 print("Bluetooth connection lost")
                 print("Closing connection & restarting...\n\n")
                 self.client_socket.close()
-                server_socket.close()
+                self.server_socket.close()
 
                 self.device_address = ""
                 self.device_name = ""
 
-                server_socket, self.client_socket = self.create_server()
+                self.server_socket, self.client_socket = self.create_server()
             except KeyboardInterrupt:
+                self.isConnected = False
                 self.isRunning = False
 
         print("Closing connection....")
         self.client_socket.close()
-        server_socket.close()
+        self.server_socket.close()
         self.device_address = ""
         self.device_name = ""
         print("Connection closed.\n\n")
@@ -126,8 +168,12 @@ class BT_Server:
         bluetooth_message = BluetoothMessage(cmd)
         self.client_socket.send(self.aes.encrypt(str(bluetooth_message)).encode())
 
+    def send_ack(self, cmd):
+        self.send_cmd("ACK " + cmd)
+
     def execute_cmd(self, cmd):
         cmd = self.validate_bluetooth_message(cmd)
+        print(cmd)
 
         if cmd is None:
             print("Invalid command")
@@ -139,12 +185,19 @@ class BT_Server:
 
         if cmd == 'SGK':
             print("SGK - Send Generated Keychain-Key\n")
+            key = args[0]
+            print("key: " + key)
+            self.send_ack(cmd)
 
         elif cmd == 'SK':
             print("SK - Send Keychain-Key\n")
+            key = args[0]
+            print("key: " + key)
+            self.send_ack(cmd)
 
         elif cmd == 'SCA':
             print("SCA - Send Challenge Answer\n")
+            self.challenge_answer = args[0]
 
         elif cmd == "ola":
             self.send_cmd("ola tudo bem")

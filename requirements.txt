@@ -1,9 +1,5 @@
-# sudo apt-get install bluetooth libbluetooth-dev
-# sudo apt install bluez
-
 pybluez
 pycrypto
-
 flask
 flask_qrcode
 keyring
