@@ -38,16 +38,10 @@ import shlex
 import os
 import random
 import string
-import regex
 import secrets
 import shutil
-import base64
-
-import argon2
-import binascii
 import Crypto.Random
 
-from pathlib import Path
 
 from config import CONFIG
 from keystore import get_key, set_key
