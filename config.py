@@ -1,6 +1,8 @@
 import os
 import json
 
+from copy import deepcopy
+
 from utils import Singleton
 
 
@@ -9,13 +11,14 @@ class CONFIG(metaclass=Singleton):
     PATH = './config.json'
 
     default_config = {
-        'directories': {}
+        'directories': []
     }
 
     # default_config = {
     #     'directories': {
     #         'path':{
-    #             'FNEK':''
+    #             'hash':'',
+    #             'fnek_salt':''
     #         }
     #     },
     # }
@@ -29,12 +32,12 @@ class CONFIG(metaclass=Singleton):
             else:
                 with open(self.PATH, 'w') as f:
                     json.dump(self.default_config, f)
-                
+
                 # set default
-                self.config = self.default_config
+                self.config = deepcopy(self.default_config)
         except Exception:
             print('File corrupted - Loading default config')
-            self.config = self.default_config
+            self.config = deepcopy(self.default_config)
 
     def _save_config(self):
         with open(self.PATH, 'w') as f:
@@ -45,4 +48,7 @@ class CONFIG(metaclass=Singleton):
 
     def set_config(self, config):
         self.config = config
+        self._save_config()
+    def reset(self):
+        self.config = deepcopy(self.default_config)
         self._save_config()
