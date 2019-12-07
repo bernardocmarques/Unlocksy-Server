@@ -11,14 +11,13 @@ class CONFIG(metaclass=Singleton):
     PATH = './config.json'
 
     default_config = {
-        'directories': []
+        'directories': {}
     }
 
     # default_config = {
     #     'directories': {
     #         'path':{
-    #             'hash':'',
-    #             'fnek_salt':''
+    #             'enc_path':'',
     #         }
     #     },
     # }

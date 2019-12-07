@@ -54,47 +54,7 @@ from keystore import get_key, set_key
 
 CURRENT_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-
-# def _add_directory(path):
-#     config = CONFIG().get_config()
-#     config['directories'].append()
-
-#     CONFIG().set_config(config)
-
-# around 200ms (time cost 20 -> 400ms)
-# passhasher = argon2.PasswordHasher(time_cost=10)
-
-
-# def _fnek_hashing(key, salt):
-#     '''
-#     file name encrypting keys
-#     To be used when decrypting filenames
-#     '''
-#     hash= argon2.low_level.hash_secret_raw(key.encode(),
-#                                             salt.encode(),
-#                                             time_cost=10,
-#                                             memory_cost=102400,
-#                                             parallelism=8,
-#                                             hash_len=8,
-#                                             type=argon2.low_level.Type.ID)
-
-#     return binascii.hexlify(hash)
-
-# def _verify_key(directory, key):
-#     config = CONFIG().get_config()
-#     hash = config['directories'][directory]['hash']
-
-#     # verify if hashes match, if not throws error
-#     passhasher.verify(hash, key)
-
-#     # Now that we have the cleartext password,
-#     # check the hash's parameters and if outdated,
-#     # rehash the user's password in the database.
-#     if passhasher.check_needs_rehash(hash):
-
-#         config['directories'][directory]['hash'] = passhasher.hash(key)
-#         CONFIG().set_config(config)  #update config
-
+ENCRYPT_PATH = f'{CURRENT_SCRIPT_PATH}/encrypted'
 
 def _randomString(stringLength=10):
     """Generate a random string of fixed length 
@@ -135,52 +95,36 @@ def _move_files_from_folder(source, dest):
     shutil.rmtree(source)
 
 
-def _mount_directory(directory, key, new=False):
-    # if new:
-    # p = subprocess.run(shlex.split('ecryptfs-add-passphrase --fnek'),
-    #                    stdout=subprocess.PIPE,
-    #                    input=f'{key}\n',
-    #                    encoding='ascii')
-    # print(p.returncode)
-    # # -> 0
+def _mount_directory(directory,enc_directory,key):
 
-    #     if p.returncode != 0:
-    #         raise Exception('Error in saving fnek')
+    if not os.path.isdir(directory):
+        os.mkdir(directory)
 
-    #     # print(p.stdout)
-    #     fnek = regex.findall('\[(.*)\]', p.stdout)[0]
-    # else:
-    #     config = CONFIG().get_config()
-    #     salt = config['directories'][directory]['fnek_salt']  #FIXME throws not exists
-    #     fnek = _fnek_hashing(key,salt)
+    shell_env = os.environ.copy()
+    shell_env["CRYFS_FRONTEND"] = "noninteractive"
 
     p = subprocess.run(shlex.split(
-        f'sudo {CURRENT_SCRIPT_PATH + "/utils/decrypt.sh"} {directory}'
-    ),
+        f'cryfs {enc_directory} {directory}'),
         stdout=subprocess.PIPE,
-        input=f'passphrase_passwd={key}\n',
-        encoding='ascii')
-
-    print(p.returncode)
-    # -> 0
-
+        stderr=subprocess.PIPE,
+        input=f'{key}\n',
+        encoding='ascii',
+        env=shell_env)
+    #
+    # print(p.returncode)
+    # # -> 0
+    #
     if p.returncode != 0:
-        raise Exception(f'exit code {p.returncode} Error in Decrypting - Probably wrong key - ' +
-                        p.stdout)
+        raise Exception(f'exit code {p.returncode} Error in Decrypting - {p.stdout} - {p.stderr}')
 
     # se for novo registar no config
-    if new:
-        # FIXME
-        config = CONFIG().get_config()
-        config['directories'].append(directory)
-        # config['directories'][directory] = {'fnek_salt': salt,'hash':passhasher.hash(key)}
-        CONFIG().set_config(config)  # update config
+
 
 
 def _umount_directory(directory):
     # FIXME NEEDS WORK
     process = subprocess.Popen(shlex.split(
-        f'sudo {CURRENT_SCRIPT_PATH + "/utils/encrypt.sh"} {directory}'),
+        f' fusermount -u {directory}'),
         stdout=subprocess.PIPE,
         stdin=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -230,6 +174,9 @@ def register_new_directory(path, mac, master_key):
 
     # file key must be a string
     key = _generate_safe_password(24)
+    random_name = _randomString(24)
+
+    encrypted_path = f'{ENCRYPT_PATH}/{random_name}'
 
     # FIXME pudia ser refatorizado
     if os.path.isdir(path):
@@ -239,20 +186,24 @@ def register_new_directory(path, mac, master_key):
             # has files, therefore backup
             renamed_folder = _try_rename_folder(path)
 
-            os.mkdir(path)
+            os.mkdir(encrypted_path)
 
-            _mount_directory(path, key, new=True)
+            _mount_directory(path,encrypted_path, key)
 
             # move from backup to destination
             _move_files_from_folder(renamed_folder, path)
 
         else:
-            _mount_directory(path, key, new=True)
+            _mount_directory(path,encrypted_path, key)
 
     elif not os.path.exists(path):
-        os.mkdir(path)
+        os.mkdir(encrypted_path)
 
-        _mount_directory(path, key, new=True)
+        _mount_directory(path,encrypted_path, key)
+
+    config = CONFIG().get_config()
+    config['directories'][path] = {'enc_path': encrypted_path}
+    CONFIG().set_config(config)  # update config
 
     set_key(path, mac, master_key, key)
 
@@ -276,8 +227,8 @@ def decrypt_directory(path, mac, master_key):
     if not file_key:
         raise Exception('No key in keystore')
 
-    if path in config['directories']:
-        _mount_directory(path, file_key)
+    if path in config['directories'].keys():
+        _mount_directory(path,config['directories'][path]['enc_path'], file_key)
     else:
         raise Exception('Directory is not in config')
 
@@ -289,22 +240,10 @@ def lockdown():
     '''
     config = CONFIG().get_config()
 
-    for directory in config['directories']:
+    for directory in config['directories'].keys():
         _umount_directory(directory)
 
 
 def list_directories():
     config = CONFIG().get_config()
-    return tuple(config['directories'])
-
-
-if __name__ == "__main__":
-    folder = './testencrypt'
-    os.system(f'rm -rf {folder}')
-
-    os.mkdir(folder)
-
-    mac = '00:21:213312'
-    wrong_mac = '00012003:::3'
-    master_key = 'olakey'
-    wrong_key = 'npoekey'
+    return tuple(config['directories'].keys())

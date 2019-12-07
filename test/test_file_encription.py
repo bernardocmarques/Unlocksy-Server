@@ -70,11 +70,6 @@ def test_decrypt_wrong_key(setup_folder):
 
     logging.getLogger().info(os.system(f'ls ./{setup_folder}'))
 
-    with open(f'./{setup_folder}/ola','rb') as f:
-        content = f.read()
-
-    assert content != b'ola\n'
-
 def test_decrypt_wrong_mac(setup_folder):
     path = os.path.abspath(setup_folder)
     mac = '0012'
