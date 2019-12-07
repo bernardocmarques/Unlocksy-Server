@@ -44,15 +44,19 @@
 
 
         <!-- connected -->
-        {% if device_name != '' %}
+        {% if is_connected == True %}
             <div class="d-inline-flex justify-content-center align-items-center connected mb-4">
                 <img class="BT-icon" src="../static/assets/BT-green.svg" alt="">
-                <span class="device-name ml-3">{{ device_name }}</span>
+                {% if device_name == '' %}
+                    <span class="ml-3">Connected</span>
+                {% else %}
+                    <span class="device-name ml-3">{{ device_name }}</span>
+                {% endif %}
             </div>
         {% endif %}
 
         <!-- disconnected -->
-        {% if device_name == '' %}
+        {% if is_connected == False %}
             <div class="d-inline-flex justify-content-center align-items-center disconnected mb-4">
                 <img class="BT-icon" src="../static/assets/BT-red.svg" alt="">
                 <span class="ml-3">Not connected</span>
