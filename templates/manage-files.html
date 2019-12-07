@@ -13,11 +13,28 @@
     <script src="https://kit.fontawesome.com/c9518678ef.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <!-- logo -->
-    <a class="d-inline-flex logo align-items-center p-4" href="{{ url_for('home') }}">
-        <img class="mr-3 mb-1" src="../static/assets/padlock.svg" alt="">
-        <span>Unlocksy</span>
-    </a>
+    <div class="d-flex header justify-content-between align-items-center">
+        <!-- logo -->
+        <a class="d-inline-flex logo align-items-center p-4" href="{{ url_for('home') }}">
+            <img class="mr-3 mb-1" src="../static/assets/padlock.svg" alt="">
+            <span>Unlocksy</span>
+        </a>
+
+        <!-- server running -->
+        {% if is_running == True %}
+            <div class="d-inline-flex server-running align-items-center p-4">
+                <div class="lds-dual-ring mr-2"></div>
+                <span>Server is running...</span>
+            </div>
+        {% endif %}
+
+        <!-- server not running -->
+        {% if is_running == False %}
+            <div class="d-inline-flex server-running align-items-center p-4">
+                <span>Server not running</span>
+            </div>
+        {% endif %}
+    </div>
         
     <div class="d-flex flex-column wrapper align-items-center justify-content-center">
 
