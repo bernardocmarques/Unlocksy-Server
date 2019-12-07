@@ -33,7 +33,7 @@ class BT_Server:
     def __init__(self, rsa):
         self.aes = AES_Util()
         self.rsa = rsa
-        self.server_socket = self.client_socket = None
+        self.client_socket = None
         self.isRunning = False
         self.device_address = ""
         self.device_name = ""
@@ -59,8 +59,10 @@ class BT_Server:
             exit()
 
         print("Connected to", address)
+
         self.device_address = address[0]
-        # threading.Thread(target=self.find_device_name).start()
+        threading.Thread(target=self.find_device_name).start()
+
         key_enc = client_sock.recv(2048).decode()
         key = self.rsa.decrypt_msg(key_enc)
 
@@ -73,13 +75,12 @@ class BT_Server:
             server_sock.close()
             self.device_name = ""
             self.device_address = ""
-            self.create_server()
+            return self.create_server()
 
-        self.server_socket = server_sock
-        self.client_socket = client_sock
+        return server_sock, client_sock
 
     def find_device_name(self):
-        while self.device_name == "":
+        while self.device_name == "" and self.device_address != "":
             print("Finding connection...")
             nearby_devices = discover_devices(duration=4, lookup_names=True, )
             print("%d devices found" % len(nearby_devices))
@@ -92,30 +93,30 @@ class BT_Server:
 
     def run_server(self):
         self.isRunning = True
-        self.create_server()
-        server_socket = self.server_socket
-        client_socket = self.client_socket
+        server_socket, self.client_socket = self.create_server()
 
         while self.isRunning:
             try:
                 print("Waiting for commands...")
-                data = client_socket.recv(2048).decode()
+                data = self.client_socket.recv(2048).decode()
                 msg, iv = data.split(" ")
                 cmd = self.aes.decrypt(msg, iv)
                 self.execute_cmd(cmd)
             except BluetoothError:
                 print("Bluetooth connection lost")
                 print("Closing connection & restarting...\n\n")
-                client_socket.close()
+                self.client_socket.close()
                 server_socket.close()
+
                 self.device_address = ""
                 self.device_name = ""
-                self.create_server()
+
+                server_socket, self.client_socket = self.create_server()
             except KeyboardInterrupt:
                 self.isRunning = False
 
         print("Closing connection....")
-        client_socket.close()
+        self.client_socket.close()
         server_socket.close()
         self.device_address = ""
         self.device_name = ""
@@ -147,7 +148,7 @@ class BT_Server:
 
         elif cmd == "ola":
             self.send_cmd("ola tudo bem")
-
+            pass
         else:
             print("Unknown command")
             print(" ".join(cmd_splited))
