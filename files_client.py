@@ -166,6 +166,10 @@ def register_new_directory(path, mac, master_key):
     :param path:
     :return: key
     '''
+
+    if not os.path.isdir(ENCRYPT_PATH):
+        os.mkdir(ENCRYPT_PATH)
+
     # work with absolute path
     path = os.path.abspath(path)
 
