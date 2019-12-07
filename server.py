@@ -1,15 +1,42 @@
+from datetime import datetime
+
 from bluetooth import *
 from AES_Util import *
+import threading
+from BluetoothMessage import BluetoothMessage
 
 
 class BT_Server:
+    nonces = []
+
+    # noinspection PyBroadException
+    def validate_bluetooth_message(self, string):
+        try:
+            string_splited = string.split(",")
+            msg = string_splited[0]
+            nonce = string_splited[1]
+            t1 = eval(string_splited[2]) / 1000
+            t2 = eval(string_splited[3]) / 1000
+            bluetooth_message = BluetoothMessage(msg, nonce, t1, t2)
+        except Exception as e:
+            print("Exception:", e)
+            return None
+
+        if bluetooth_message.nonce in self.nonces:
+            print("Repeated Nonce")
+            return None
+        else:
+            self.nonces.append(bluetooth_message.nonce)
+            now = datetime.now()
+            return bluetooth_message.message if bluetooth_message.t1 < now < bluetooth_message.t2 else None
 
     def __init__(self, rsa):
         self.aes = AES_Util()
         self.rsa = rsa
         self.server_socket = self.client_socket = None
         self.isRunning = False
-        self.deviceAddress = None
+        self.device_address = ""
+        self.device_name = ""
 
     def create_server(self):
         server_sock = BluetoothSocket(RFCOMM)
@@ -31,24 +58,40 @@ class BT_Server:
         except KeyboardInterrupt:
             exit()
 
-        self.deviceAddress = address[0]
-
+        print("Connected to", address)
+        self.device_address = address[0]
+        # threading.Thread(target=self.find_device_name).start()
         key_enc = client_sock.recv(2048).decode()
         key = self.rsa.decrypt_msg(key_enc)
 
         if key:
             self.aes.set_key_base64(key)
         else:
-            print("Could not get key\nClosing connection & restarting...\n\n")
+            print("Could not get key")
+            print("Closing connection & restarting...\n\n")
             client_sock.close()
             server_sock.close()
-            self.deviceAddress = None
-            return self.create_server()
+            self.device_name = ""
+            self.device_address = ""
+            self.create_server()
 
         self.server_socket = server_sock
         self.client_socket = client_sock
 
+    def find_device_name(self):
+        while self.device_name == "":
+            print("Finding connection...")
+            nearby_devices = discover_devices(duration=4, lookup_names=True, )
+            print("%d devices found" % len(nearby_devices))
+            for addr, name in nearby_devices:
+                print("Found %s  (%s)" % (name, addr))
+                if addr == self.device_address:
+                    print("Connected to %s  (%s)\n" % (name, addr))
+                    self.device_name = name
+                    break
+
     def run_server(self):
+        self.create_server()
         self.isRunning = True
         server_socket = self.server_socket
         client_socket = self.client_socket
@@ -61,10 +104,12 @@ class BT_Server:
                 cmd = self.aes.decrypt(msg, iv)
                 self.execute_cmd(cmd)
             except BluetoothError:
-                print("Bluetooth connection lost\nClosing connection & restarting...\n\n")
+                print("Bluetooth connection lost")
+                print("Closing connection & restarting...\n\n")
                 client_socket.close()
                 server_socket.close()
-                self.deviceAddress = None
+                self.device_address = ""
+                self.device_name = ""
                 self.create_server()
             except KeyboardInterrupt:
                 self.isRunning = False
@@ -72,10 +117,21 @@ class BT_Server:
         print("Closing connection....")
         client_socket.close()
         server_socket.close()
-        self.deviceAddress = None
+        self.device_address = ""
+        self.device_name = ""
         print("Connection closed.\n\n")
 
+    def send_cmd(self, cmd):
+        bluetooth_message = BluetoothMessage(cmd)
+        self.client_socket.send(self.aes.encrypt(str(bluetooth_message)).encode())
+
     def execute_cmd(self, cmd):
+        cmd = self.validate_bluetooth_message(cmd)
+
+        if cmd is None:
+            print("Invalid command")
+            return
+
         cmd_splited = cmd.split(" ")
         cmd = cmd_splited[0]
         args = cmd_splited[1:]
@@ -89,5 +145,9 @@ class BT_Server:
         elif cmd == 'SCA':
             print("SCA - Send Challenge Answer\n")
 
+        elif cmd == "ola":
+            self.send_cmd("ola tudo bem")
+
         else:
-            print("Unknown command\n")
+            print("Unknown command")
+            print(" ".join(cmd_splited))

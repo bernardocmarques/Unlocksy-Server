@@ -22,6 +22,9 @@
     
     <div class="d-flex flex-column wrapper align-items-center justify-content-center">
 
+        <span class="device-name ml-3">{{ server_running }}</span>
+
+
         <!-- connected -->
         {% if device_name != '' %}
             <div class="d-inline-flex justify-content-center align-items-center connected mb-4">
@@ -39,9 +42,9 @@
         {% endif %}
 
         <!-- buttons -->
-        <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('manageDevices') }}">Manage devices</a>
-        <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('qrCode') }}">Read QR code</a>
-        <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('manageFiles') }}">Manage files</a>
+        <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('manage_devices') }}">Manage devices</a>
+        <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('qr_code') }}">Read QR code</a>
+        <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('manage_files') }}">Manage files</a>
     </div>
     
 </body>
