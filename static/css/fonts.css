@@ -33,13 +33,13 @@
 
 
   /* ===================================================================
-   *  Pacifico
+   *  Gugi
    *
    * ------------------------------------------------------------------- */
 
    @font-face {
-    font-family: "pacifico";
-    src: url("../fonts/Pacifico/Pacifico-Regular.ttf") format("truetype");
+    font-family: "gugi";
+    src: url("../fonts/Gugi/Gugi-Regular.ttf") format("truetype");
     font-style: normal;
     font-weight: normal;
   }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <meta http-equiv="refresh" content="5">
+    <meta http-equiv="refresh" content="5">
     <title>Homepage</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -14,11 +14,29 @@
 </head>
 
 <body>
-    <!-- logo -->
-    <a class="d-inline-flex logo align-items-center p-4" href="{{ url_for('home') }}">
-        <i class="fas fa-home mr-2"></i>
-        <span>Some Name</span>
-    </a>
+
+    <div class="d-flex header justify-content-between align-items-center">
+        <!-- logo -->
+        <a class="d-inline-flex logo align-items-center p-4" href="{{ url_for('home') }}">
+            <img class="mr-3 mb-1" src="../static/assets/padlock.svg" alt="">
+            <span>Unlocksy</span>
+        </a>
+
+        <!-- server running -->
+        {% if is_running == True %}
+            <div class="d-inline-flex server-running align-items-center p-4">
+                <div class="lds-dual-ring mr-2"></div>
+                <span>Server is running...</span>
+            </div>
+        {% endif %}
+
+        <!-- server not running -->
+        {% if is_running == False %}
+            <div class="d-inline-flex server-running align-items-center p-4">
+                <span>Server not running</span>
+            </div>
+        {% endif %}
+    </div>
     
     <div class="d-flex flex-column wrapper align-items-center justify-content-center">
 

@@ -27,17 +27,43 @@ body {
   font-size: 1.5rem;
 }
 
-.logo i, .logo:hover {
-  color: #5ABA8A;
-}
-
 .logo span, .logo:hover {
-  font-family: 'pacifico', sans-serif;
+  font-family: 'gugi', sans-serif;
   color: #E0E0E0;
 }
 
 .logo:hover {
   text-decoration: none;
+}
+
+.server-running span {
+  color: white;
+}
+
+.lds-dual-ring {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+}
+
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 33px;
+  height: 33px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  border-color: #309489 transparent #309489 transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .wrapper {

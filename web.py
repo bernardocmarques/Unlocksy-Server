@@ -17,12 +17,12 @@ server = BT_Server(rsa)
 @app.route("/")
 def home():
     run()
-    return render_template("index.html", device_name=server.device_name)
+    return render_template("index.html", device_name=server.device_name, is_running=server.isRunning)
 
 
 @app.route("/manage-devices")
 def manage_devices():
-    return render_template("manage-devices.html", device_name=server.device_name)
+    return render_template("manage-devices.html", device_name=server.device_name, is_running=server.isRunning)
 
 
 def get_mac():
@@ -39,15 +39,14 @@ def get_mac():
 def qr_code():
     data = get_mac() + "\n"
     data += rsa.get_public_key_base64()
-    return render_template("qr-code.html", qrcode_img=qrcode(data), device_name=server.device_name)
+    return render_template("qr-code.html", qrcode_img=qrcode(data), device_name=server.device_name, is_running=server.isRunning)
 
 
 @app.route("/manage-files")
 def manage_files():
-    return render_template("manage-files.html", device_name=server.device_name)
+    return render_template("manage-files.html", device_name=server.device_name, is_running=server.isRunning)
 
 
-@app.route("/run")
 def run():
     print(server.isRunning)
 
@@ -55,8 +54,6 @@ def run():
         print("Server is already running!")
     else:
         threading.Thread(target=server.run_server).start()
-
-    return render_template("run-server.html")
 
 
 if __name__ == "__main__":

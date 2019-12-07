@@ -91,8 +91,8 @@ class BT_Server:
                     break
 
     def run_server(self):
-        self.create_server()
         self.isRunning = True
+        self.create_server()
         server_socket = self.server_socket
         client_socket = self.client_socket
 
