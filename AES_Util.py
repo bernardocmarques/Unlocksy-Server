@@ -7,8 +7,11 @@ import math
 
 class AES_Util:
 
-    def __init__(self):
-        self.key = Crypto.Random.get_random_bytes(32)
+    def __init__(self,key=None):
+        if key:
+            self.key = key
+        else:
+            self.key = Crypto.Random.get_random_bytes(32)
 
     def encrypt(self, data):
         iv = Crypto.Random.get_random_bytes(16)

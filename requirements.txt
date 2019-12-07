@@ -24,3 +24,4 @@ pycrypto
 
 flask
 flask_qrcode
+keyring
