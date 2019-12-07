@@ -56,6 +56,7 @@ CURRENT_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 ENCRYPT_PATH = f'{CURRENT_SCRIPT_PATH}/encrypted'
 
+
 def _randomString(stringLength=10):
     """Generate a random string of fixed length 
     UNSAFE FOR PASSWORDS
@@ -65,23 +66,21 @@ def _randomString(stringLength=10):
 
 
 def _try_rename_folder(path):
-    i = 0
+    dest_path = _generate_unique_name(os.path.dirname(path), create_folder=False)
+    os.rename(path, dest_path)
+    return dest_path
+
+
+def _generate_unique_name(path, create_folder=True):
     while True:
-        dest_path = path + _randomString()
+        random_name = _randomString(24)
+        encrypted_path = f'{path}/{random_name}'
+        if not os.path.exists(encrypted_path):
 
-        try:
-            os.rename(path, dest_path)
-        except OSError as e:
-            # not renamed
-            i += 1
-            if i > 5:
-                print(e)
-                raise e
-            else:
-                # try again
-                continue
+            if create_folder:
+                os.mkdir(encrypted_path)
 
-        return dest_path
+            return encrypted_path
 
 
 def _move_files_from_folder(source, dest):
@@ -95,8 +94,7 @@ def _move_files_from_folder(source, dest):
     shutil.rmtree(source)
 
 
-def _mount_directory(directory,enc_directory,key):
-
+def _mount_directory(directory, enc_directory, key):
     if not os.path.isdir(directory):
         os.mkdir(directory)
 
@@ -118,7 +116,6 @@ def _mount_directory(directory,enc_directory,key):
         raise Exception(f'exit code {p.returncode} Error in Decrypting - {p.stdout} - {p.stderr}')
 
     # se for novo registar no config
-
 
 
 def _umount_directory(directory):
@@ -144,6 +141,7 @@ def _generate_safe_password(size=32):
     stringSource = string.ascii_letters + string.digits + string.punctuation
 
     return ''.join(secrets.choice(stringSource) for i in range(size))
+
 
 def _generate_safe_key(size=32):
     return Crypto.Random.get_random_bytes(size)
@@ -178,9 +176,7 @@ def register_new_directory(path, mac, master_key):
 
     # file key must be a string
     key = _generate_safe_password(24)
-    random_name = _randomString(24)
-
-    encrypted_path = f'{ENCRYPT_PATH}/{random_name}'
+    encrypted_path = _generate_unique_name(ENCRYPT_PATH)
 
     # FIXME pudia ser refatorizado
     if os.path.isdir(path):
@@ -190,20 +186,17 @@ def register_new_directory(path, mac, master_key):
             # has files, therefore backup
             renamed_folder = _try_rename_folder(path)
 
-            os.mkdir(encrypted_path)
-
-            _mount_directory(path,encrypted_path, key)
+            _mount_directory(path, encrypted_path, key)
 
             # move from backup to destination
             _move_files_from_folder(renamed_folder, path)
 
         else:
-            _mount_directory(path,encrypted_path, key)
+            _mount_directory(path, encrypted_path, key)
 
     elif not os.path.exists(path):
-        os.mkdir(encrypted_path)
 
-        _mount_directory(path,encrypted_path, key)
+        _mount_directory(path, encrypted_path, key)
 
     config = CONFIG().get_config()
     config['directories'][path] = {'enc_path': encrypted_path}
@@ -232,7 +225,7 @@ def decrypt_directory(path, mac, master_key):
         raise Exception('No key in keystore')
 
     if path in config['directories'].keys():
-        _mount_directory(path,config['directories'][path]['enc_path'], file_key)
+        _mount_directory(path, config['directories'][path]['enc_path'], file_key)
     else:
         raise Exception('Directory is not in config')
 
