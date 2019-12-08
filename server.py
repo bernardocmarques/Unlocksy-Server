@@ -46,7 +46,7 @@ class BT_Server:
         self.device_address = ""
         self.device_name = ""
         self.challenge_answer = None
-        self.isLockdown = False  # fixme queremos isto?
+        self.isLockdown = False
         self.isNear = None
 
     def create_server(self):
@@ -134,7 +134,7 @@ class BT_Server:
 
     def request_challenge(self, challenge):
         self.send_cmd("RCA " + str(challenge))
-        print("REQUEST Challenge " + self.device_address)
+        print("RCA " + str(challenge))
 
     def challenge(self):
         time.sleep(15)
@@ -196,6 +196,9 @@ class BT_Server:
     def send_ack(self, cmd):
         self.send_cmd("ACK " + cmd)
 
+    def add_device(self):
+        self.send_cmd("RGK")
+
     def execute_cmd(self, cmd):
         cmd = self.validate_bluetooth_message(cmd)
         print(cmd)
@@ -210,6 +213,12 @@ class BT_Server:
 
         if cmd == 'SGK':
             print("SGK - Send Generated Keychain-Key\n")
+            key = args[0]
+            print("key: " + key)
+            self.send_ack(cmd)
+
+        elif cmd == 'SNK':
+            print("SNK - Send New Generated Keychain-Key\n")
             key = args[0]
             print("key: " + key)
             self.send_ack(cmd)

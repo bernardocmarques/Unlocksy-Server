@@ -47,6 +47,13 @@ def manage_files():
     return render_template("manage-files.html", device_name=server.device_name, is_running=server.isRunning)
 
 
+@app.route("/add-device")
+def add_device():
+    print("here")
+    server.add_device()
+    return "ok", 200
+
+
 def run():
     if not server.isRunning:
         threading.Thread(target=server.run_server).start()

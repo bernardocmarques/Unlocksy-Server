@@ -37,3 +37,14 @@ $(document).ready(function(){
 
     // Trigger alerts here
 });
+
+function makeHttpRequest(url) {
+
+        const Http = new XMLHttpRequest();
+        Http.open("GET", url);
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            console.log(Http.responseText)
+        }
+    }

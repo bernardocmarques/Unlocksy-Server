@@ -20,5 +20,4 @@ class BluetoothMessage:
             self.t2 = now + timedelta(seconds=30)
 
     def __str__(self):
-        print(datetime.now())
         return self.message + "," + self.nonce + "," + str(int(self.t1.timestamp() * 1000)) + "," + str(int(self.t2.timestamp() * 1000)) + ""
