@@ -44,7 +44,7 @@ import Crypto.Random
 
 
 from config import CONFIG
-from keystore import get_key, set_key
+import keystore
 
 CURRENT_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -64,6 +64,18 @@ def _try_rename_folder(path):
     os.rename(path, dest_path)
     return dest_path
 
+def _try_copy_files_to_temp_location(path):
+    '''
+    moves some file to a temporary location
+    '''
+    dest_path = _generate_unique_name(os.path.dirname(path), create_folder=True)
+
+    files = os.listdir(path)
+    for f in files:
+        shutil.move(f'{path}/{f}', dest_path)
+
+
+    return dest_path
 
 def _generate_unique_name(path, create_folder=True):
     while True:
@@ -196,7 +208,7 @@ def register_new_directory(path, mac, master_key):
     config['directories'][path] = {'enc_path': encrypted_path}
     CONFIG().set_config(config)  # update config
 
-    set_key(path, mac, master_key, key)
+    keystore.set_key(path, mac, master_key, key)
 
 
 def decrypt_directory(path, mac, master_key):
@@ -213,7 +225,7 @@ def decrypt_directory(path, mac, master_key):
 
     config = CONFIG().get_config()
 
-    file_key = get_key(path, mac, master_key)
+    file_key = keystore.get_key(path, mac, master_key)
 
     if path in config['directories'].keys():
         _mount_directory(path, config['directories'][path]['enc_path'], file_key)
@@ -222,9 +234,18 @@ def decrypt_directory(path, mac, master_key):
 
 
 def unlock_with_device(mac,master_key):
+    '''
+    needs testing
+    '''
     config = CONFIG().get_config()
 
-    # for path 
+    for path in config['directories'].keys():
+        # will try to decrypt
+        try:
+            decrypt_directory(path,mac,master_key)
+        except keystore.NoKeyError:
+            # phone doesnt have key, try next key
+            continue
 
 def lockdown():
     '''
@@ -236,6 +257,74 @@ def lockdown():
     for directory in config['directories'].keys():
         _umount_directory(directory)
 
+def remove_folder(path):
+    '''
+    DOES NOT REMOVE FOLDER, BUT REMOVES ENCRYPTION FROM FOLDER
+    FIXME Not TESTED
+    '''
+    config = CONFIG().get_config()
+
+    if path in config['directories'].keys():
+        encrypted_path = config['directories'][path]['enc_path']
+    else:
+        return False
+    
+    if _check_if_already_mounted(path,encrypted_path): #if already mounted then is has permission
+        
+        # blabbla backup
+        dir_contents = os.listdir(path)
+        if not len(dir_contents) == 0:
+            # has files, therefore puts original files in path 
+            temp_location = _try_copy_files_to_temp_location(path)
+
+            # dismount path
+            _umount_directory(path) 
+            #removes encrypted folder and path
+            shutil.rmtree(encrypted_path)
+            shutil.rmtree(path)
+
+            # move from backup to destination
+            os.rename(temp_location, path)
+
+
+        else:
+            #if empty remove all
+            _umount_directory(path)
+
+            shutil.rmtree(encrypted_path)
+            shutil.rmtree(path)
+
+        return True
+    else:
+        return False
+
+
+
+
+
+def update_keys(mac, old_master_key, new_master_key):
+    config = CONFIG().get_config()
+
+    for path in config['directories'].keys():
+        # will try to decrypt
+        try:
+            file_key = keystore.get_key(path,mac,old_master_key)
+
+            #update
+            keystore.set_key(path,mac, new_master_key,file_key)
+
+        except keystore.NoKeyError:
+            # phone doesnt have key, try next key
+            continue
+
+def _check_if_already_mounted(directory,enc_directory):
+    p = subprocess.run(shlex.split('mount'),stdout=subprocess.PIPE)
+
+    mount_devices = p.stdout.decode()
+    search_mountpoint = f'cryfs@{enc_directory} on {directory}'
+    return search_mountpoint in mount_devices 
+
+    
 
 def list_directories():
     config = CONFIG().get_config()

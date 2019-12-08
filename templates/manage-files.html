@@ -61,6 +61,10 @@
 
         <!-- files -->
         <!-- TODO files -->
+        <!-- buttons -->
+        <a class="btn btn-lg btn-primary shadow my-3" onclick="makeHttpRequest('{{ url_for('add_folder') }}')">Add Folder</a>
+        <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('qr_code') }}">Remove Folder</a>
+
 
         <!-- go back -->
         <a class="d-inline-flex go-back align-items-center" href="{{ url_for('home') }}">

@@ -8,10 +8,13 @@ from AES_Util import *
 import threading
 from BluetoothMessage import BluetoothMessage
 
+import files_client
 
 class Lockdown(Exception):
     pass
 
+class DeviceNotConnected(Exception):
+    pass
 
 class BT_Server:
     nonces = []
@@ -22,8 +25,8 @@ class BT_Server:
             string_splited = string.split(",")
             msg = string_splited[0]
             nonce = string_splited[1]
-            t1 = eval(string_splited[2]) / 1000
-            t2 = eval(string_splited[3]) / 1000
+            t1 = int(string_splited[2]) / 1000
+            t2 = int(string_splited[3]) / 1000
             bluetooth_message = BluetoothMessage(msg, nonce, t1, t2)
         except Exception as e:
             print("Exception:", e)
@@ -48,6 +51,7 @@ class BT_Server:
         self.challenge_answer = None
         self.isLockdown = False
         self.isNear = None
+        self.master_key = None
 
     def create_server(self):
         server_sock = BluetoothSocket(RFCOMM)
@@ -132,6 +136,9 @@ class BT_Server:
         self.client_socket.shutdown(2)
         self.isLockdown = True
 
+        files_client.lockdown()
+
+
     def request_challenge(self, challenge):
         self.send_cmd("RCA " + str(challenge))
         print("RCA " + str(challenge))
@@ -144,7 +151,7 @@ class BT_Server:
             challenge = random.randint(0, 10000000)
             self.request_challenge(challenge)
             time.sleep(15)
-            if self.challenge_answer is None or not eval(self.challenge_answer) == challenge + 1:
+            if self.challenge_answer is None or not int(self.challenge_answer) == challenge+1:
                 nr_try += 1
                 print("wrong challenge answer (" + str(nr_try) + ")")
                 if nr_try == 3:
@@ -176,6 +183,7 @@ class BT_Server:
 
                 self.device_address = ""
                 self.device_name = ""
+                self.master_key= None
 
                 self.server_socket, self.client_socket = self.create_server()
             except KeyboardInterrupt:
@@ -199,6 +207,33 @@ class BT_Server:
     def add_device(self):
         self.send_cmd("RGK")
 
+    def get_master_key(self):
+        '''
+        FIXME check if the variable should not stay in memory
+        '''
+        self.master_key = None 
+        self.send_cmd("RK")
+
+        while not self.master_key:
+            time.sleep(0.25)
+        
+        
+    def add_folder(self,path):
+        if not self.isConnected or not self.device_address:
+            raise DeviceNotConnected()
+        
+        if not self.master_key:
+            self.get_master_key()
+        
+
+        files_client.register_new_directory(path,self.device_address,self.master_key)
+
+        pass
+    def list_folders(self):
+        return files_client.list_directories()
+    def remove_folder(self,folder_path):
+        pass
+
     def execute_cmd(self, cmd):
         cmd = self.validate_bluetooth_message(cmd)
         print(cmd)
@@ -213,21 +248,16 @@ class BT_Server:
 
         if cmd == 'SGK':
             print("SGK - Send Generated Keychain-Key\n")
-            key = args[0]
-            print("key: " + key)
+            self.master_key = args[0]
+            print("key: " + self.master_key)
             self.send_ack(cmd)
 
         elif cmd == 'SNK':
             print("SNK - Send New Generated Keychain-Key\n")
-            key = args[0]
-            print("key: " + key)
+            self.master_key = args[0]
+            print("key: " + self.master_key)
             self.send_ack(cmd)
 
-        elif cmd == 'SK':
-            print("SK - Send Keychain-Key\n")
-            key = args[0]
-            print("key: " + key)
-            self.send_ack(cmd)
 
         elif cmd == 'SCA':
             print("SCA - Send Challenge Answer\n")

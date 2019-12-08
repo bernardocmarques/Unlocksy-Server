@@ -21,4 +21,3 @@ def get_key(abs_path,mac,master_key):
     except UnicodeDecodeError:
         # wrong key
         return NoKeyError('No key in keystore')
-
