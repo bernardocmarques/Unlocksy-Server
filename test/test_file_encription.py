@@ -4,8 +4,9 @@ a differenca entre absolute paths e relative esta confusa no files client
 import pytest
 import os
 from config import CONFIG
-from files_client import register_new_directory,lockdown,decrypt_directory,_generate_safe_key,list_directories,_generate_safe_password,ENCRYPT_PATH
+from files_client import register_new_directory,lockdown,decrypt_directory,_generate_safe_key,list_directories,_generate_safe_password,ENCRYPT_PATH,ErrorDecrypt
 
+from keystore import NoKeyError
 import logging
 import base64
 
@@ -60,15 +61,9 @@ def test_decrypt_wrong_key(setup_folder):
     register_new_directory(path, mac, master_key)
 
     lockdown()
-
-    try:
+    with pytest.raises(ErrorDecrypt):
         decrypt_directory(path, mac, wrong_key)
-    except Exception:
-        # might give exception
-        # if wrong key
-        # we dumbly will ignore
-        pass
-
+    
     logging.getLogger().info(os.system(f'ls ./{setup_folder}'))
 
 def test_decrypt_wrong_mac(setup_folder):
@@ -76,7 +71,7 @@ def test_decrypt_wrong_mac(setup_folder):
     mac = '0012'
     master_key = _generate_safe_password(32)
 
-    with pytest.raises(Exception): # not in keyring
+    with pytest.raises(NoKeyError): # not in keyring
         decrypt_directory(path, mac, master_key)
 
 #

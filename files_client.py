@@ -107,7 +107,7 @@ def _mount_directory(directory, enc_directory, key):
     # # -> 0
     #
     if p.returncode != 0:
-        raise Exception(f'exit code {p.returncode} Error in Decrypting - {p.stdout} - {p.stderr}')
+        raise ErrorDecrypt(f'exit code {p.returncode} Error in Decrypting - {p.stdout} - {p.stderr}')
 
     # se for novo registar no config
 
@@ -215,14 +215,16 @@ def decrypt_directory(path, mac, master_key):
 
     file_key = get_key(path, mac, master_key)
 
-    if not file_key:
-        raise Exception('No key in keystore')
-
     if path in config['directories'].keys():
         _mount_directory(path, config['directories'][path]['enc_path'], file_key)
     else:
         raise Exception('Directory is not in config')
 
+
+def unlock_with_device(mac,master_key):
+    config = CONFIG().get_config()
+
+    # for path 
 
 def lockdown():
     '''
@@ -238,3 +240,7 @@ def lockdown():
 def list_directories():
     config = CONFIG().get_config()
     return tuple(config['directories'].keys())
+
+
+class ErrorDecrypt(Exception):
+    pass
