@@ -16,6 +16,8 @@
 
 </head>
 <body>
+    <div id="alert-container"></div>
+
     <div class="d-flex header justify-content-between align-items-center">
         <!-- logo -->
         <a class="d-inline-flex logo align-items-center p-4" href="{{ url_for('home') }}">
@@ -42,19 +44,15 @@
     <div class="d-flex flex-column wrapper align-items-center justify-content-center">
 
         <!-- connected -->
-        {% if is_connected == True %}
+        {% if device_name != '' %}
             <div class="d-inline-flex justify-content-center align-items-center connected mb-4">
                 <img class="BT-icon" src="../static/assets/BT-green.svg" alt="">
-                {% if device_name == '' %}
-                    <span class="ml-3">Connected</span>
-                {% else %}
-                    <span class="device-name ml-3">{{ device_name }}</span>
-                {% endif %}
+                <span class="device-name ml-3">{{ device_name }}</span>
             </div>
         {% endif %}
 
         <!-- disconnected -->
-        {% if is_connected == False %}
+        {% if device_name == '' %}
             <div class="d-inline-flex justify-content-center align-items-center disconnected mb-4">
                 <img class="BT-icon" src="../static/assets/BT-red.svg" alt="">
                 <span class="ml-3">Not connected</span>

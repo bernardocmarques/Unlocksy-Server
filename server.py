@@ -67,10 +67,9 @@ class BT_Server:
         except KeyboardInterrupt:
             exit()
 
-        print("Connected to", address)
-
         self.device_address = address[0]
-        threading.Thread(target=self.find_device_name).start()
+        self.device_name = lookup_name(self.device_address)
+        print("Connected to %s  (%s)\n" % (self.device_name, self.device_address))
 
         key_enc = client_sock.recv(2048).decode()
         key = self.rsa.decrypt_msg(key_enc)
@@ -89,18 +88,6 @@ class BT_Server:
         self.isConnected = True
         threading.Thread(target=self.challenge).start()
         return server_sock, client_sock
-
-    def find_device_name(self):
-        while self.device_name == "" and self.device_address != "":
-            print("Finding connection...")
-            nearby_devices = discover_devices(duration=4, lookup_names=True, )
-            print("%d devices found" % len(nearby_devices))
-            for addr, name in nearby_devices:
-                print("Found %s  (%s)" % (name, addr))
-                if addr == self.device_address:
-                    print("Connected to %s  (%s)\n" % (name, addr))
-                    self.device_name = name
-                    break
 
     def lockdown(self):
         print("-----------------------LOCKDOWN-----------------------")
