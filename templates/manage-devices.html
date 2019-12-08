@@ -60,7 +60,7 @@
         {% endif %}
 
         <!-- buttons -->
-        <button class="btn btn-lg btn-primary shadow my-3" type="button">Add new device</button>
+        <button class="btn btn-lg btn-primary shadow my-3" type="button" onclick="makeHttpRequest('{{ url_for('add_device') }}')">Add new device</button>
         <button class="btn btn-lg btn-primary shadow my-3" type="button">Remove device</button>
 
         <!-- go back -->
