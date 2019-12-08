@@ -1,4 +1,5 @@
 $(document).ready(function(){
+    console.log("entrou");
 
     // ===============================================
     //                  ALERT TYPES
@@ -31,9 +32,8 @@ $(document).ready(function(){
 
         div.appendChild(a);
         div.appendChild(textNode);
-        document.body.appendChild(div);
+        document.getElementById("alert-container").appendChild(div);
     }
 
     // Trigger alerts here
-
 });
