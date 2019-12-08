@@ -4,14 +4,14 @@ $(document).ready(function(){
     //                  ALERT TYPES
     // ===============================================
 
-    // -> alert-primary (blue)
-    // -> alert-secondary (grey)
-    // -> alert-success (green)
-    // -> alert-danger (red)
-    // -> alert-warning (yellow)
-    // -> alert-info (turquoise)
-    // -> alert-light (light)
-    // -> alert-dark (dark)
+    const ALERT_BLUE = "alert-primary";
+    const ALERT_GREY = "alert-secondary";
+    const ALERT_GREEN = "alert-success";
+    const ALERT_RED = "alert-danger";
+    const ALERT_YELLOW = "alert-warning";
+    const ALERT_TURQUOISE = "alert-info";
+    const ALERT_LIGHT = "alert-light";
+    const ALERT_DARK = "alert-dark";
 
 
     function triggerAlert(alertType, text) {
