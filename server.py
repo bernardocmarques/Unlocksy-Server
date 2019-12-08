@@ -1,4 +1,5 @@
 import time
+import subprocess
 from datetime import datetime
 import random
 
@@ -46,6 +47,7 @@ class BT_Server:
         self.device_name = ""
         self.challenge_answer = None
         self.isLockdown = False  # fixme queremos isto?
+        self.isNear = None
 
     def create_server(self):
         server_sock = BluetoothSocket(RFCOMM)
@@ -69,6 +71,7 @@ class BT_Server:
 
         self.device_address = address[0]
         self.device_name = lookup_name(self.device_address)
+        self.isNear = True  # we're assuming the device is near when reading the QR code
         print("Connected to %s  (%s)\n" % (self.device_name, self.device_address))
 
         key_enc = client_sock.recv(2048).decode()
@@ -86,8 +89,43 @@ class BT_Server:
             return self.create_server()
 
         self.isConnected = True
+        threading.Thread(target=self.check_if_near).start()
         threading.Thread(target=self.challenge).start()
         return server_sock, client_sock
+
+
+    def check_if_near(self):
+        nr_far = 0
+        nr_near = 0
+        while self.isConnected:
+            cmd_output = subprocess.check_output("hcitool rssi " + self.device_address, shell=True).decode()
+            rssi_eval = int(cmd_output.split(' ')[3])
+            print("RSSI value is: " + str(rssi_eval))
+
+            if rssi_eval == 0:
+                nr_near += 1
+                if nr_near == 3 and not self.isNear:
+                    self.isNear = True
+                    print("=======================")
+                    print("DEVICE IS NEAR")
+                    print("=======================")
+                nr_far = 0
+
+            elif rssi_eval == -1:
+                nr_far += 1
+                if nr_far == 3 and self.isNear:
+                    self.isNear = False
+                    print("=======================")
+                    print("DEVICE IS FAR")
+                    print("=======================")
+                nr_near = 0
+
+            else:
+                print("Something went wrong when checking proximity of device.")
+
+            time.sleep(1)
+
+
 
     def lockdown(self):
         print("-----------------------LOCKDOWN-----------------------")

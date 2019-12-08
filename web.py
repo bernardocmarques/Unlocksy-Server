@@ -1,7 +1,5 @@
 import threading
 
-# worked
-
 from flask import Flask, render_template, request, send_file, url_for
 from server import BT_Server
 from flask_qrcode import QRcode
