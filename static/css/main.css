@@ -193,6 +193,11 @@ body {
   text-decoration: underline;
 }
 
+#disconnect{
+  background-color: #CB6F63;
+  border-color: #CB6F63;
+}
+
 .modal-header {
   border-bottom: none;
   padding-bottom: 0;

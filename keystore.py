@@ -1,6 +1,13 @@
 import keyring
+import keyring.errors
 from AES_Util import AES_Util
 import base64
+
+class NoKeyError(Exception):
+    pass
+
+class PasswordDeleteError(Exception):
+    pass
 
 def set_key(abs_path,mac,master_key,file_key):
     aes = AES_Util(master_key)
@@ -11,11 +18,21 @@ def get_key(abs_path,mac,master_key):
     aes = AES_Util(master_key)
     obtained = keyring.get_password(abs_path, mac)
     if not obtained: #if empty
-        return obtained
+        raise NoKeyError('No key in keystore')
     try:
         encripted_key, iv = obtained.split(" ")
         return aes.decrypt(encripted_key,iv)
     except UnicodeDecodeError:
         # wrong key
-        return None
+        raise NoKeyError('No key in keystore')
 
+def share_keys(path,mac_orig,key_orig,mac_dest,key_dest):
+    file_key=get_key(path,mac_orig,key_orig)
+
+    set_key(path,mac_dest,key_dest,file_key)
+
+def delete_key(path,mac):
+    try:
+        keyring.delete_password(path,mac)
+    except keyring.errors.PasswordDeleteError:
+        raise PasswordDeleteError

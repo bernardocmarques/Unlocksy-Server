@@ -65,9 +65,15 @@
         {% endif %}
 
         <!-- buttons -->
+        {% if device_name != '' %}
         <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('manage_devices') }}">Manage devices</a>
+        {% endif %}
         <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('qr_code') }}">Read QR code</a>
         <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('manage_files') }}">Manage files</a>
+        <!-- connected -->
+        {% if device_name != '' %}
+        <a id="disconnect" class="btn btn-lg btn-primary shadow my-3" onclick="makeHttpRequest('{{ url_for('disconnect') }}');window.location.reload();">Disconnect</a>
+        {% endif %}
     </div>
     
 </body>

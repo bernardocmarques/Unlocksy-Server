@@ -61,9 +61,10 @@
         {% endif %}
 
         <!-- buttons -->
-        <button class="btn btn-lg btn-primary shadow my-3" type="button" onclick="makeHttpRequest('{{ url_for('add_device') }}')">Add new device</button>
-        <button class="btn btn-lg btn-primary shadow my-3" type="button">Remove device</button>
-
+        {% if device_name != '' %}
+        <button class="btn btn-lg btn-primary shadow my-3" type="button" onclick="makeHttpRequest('{{ url_for('remove_device') }}');window.location.reload();">Remove device</button>
+        <button class="btn btn-lg btn-primary shadow my-3" type="button" onclick="makeHttpRequest('{{ url_for('update_keys') }}');window.location.reload();">Update Device Keys</button>
+        {% endif %}
         <!-- go back -->
         <a class="d-inline-flex go-back align-items-center" href="{{ url_for('home') }}">
             <i class="fas fa-undo-alt mr-2"></i>

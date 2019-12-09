@@ -46,12 +46,45 @@ def qr_code():
 def manage_files():
     return render_template("manage-files.html", device_name=server.device_name, is_running=server.isRunning)
 
+@app.route("/add_folder", methods=["GET"])
+def add_folder():
 
-@app.route("/add-device")
+    import tkinter as tk
+    from tkinter import filedialog
+
+    root = tk.Tk()
+    root.withdraw()
+
+    folder_path = filedialog.askdirectory()
+
+
+    server.add_folder(folder_path)
+
+    return "ok",200
+
+
+
+@app.route("/add_device")
 def add_device():
     print("here")
     server.add_device()
     return "ok", 200
+
+
+@app.route('/disconnect')
+def disconnect():
+    server.disconnect()
+    return "ok",200
+
+@app.route('/device_update_keys')
+def update_keys():
+    server.update_keys()
+    return "ok",200
+
+@app.route('/remove_device')
+def remove_device():
+    server.remove_device()
+    return "ok",200
 
 
 def run():

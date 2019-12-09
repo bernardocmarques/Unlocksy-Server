@@ -62,8 +62,5 @@ def test_keystore_wrong_details():
 	real_file_key=base64.b64encode(files_client._generate_safe_key(32)).decode()
 
 	keystore.set_key('test',mac,master_key,real_file_key)
-
-	key = keystore.get_key('test',wrong_mac,master_key)
-
-	assert key != real_file_key
-	assert key == None
+	with pytest.raises(keystore.NoKeyError):
+		key = keystore.get_key('test',wrong_mac,master_key)
