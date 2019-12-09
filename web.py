@@ -39,16 +39,17 @@ def get_mac():
 def qr_code():
     data = get_mac() + "\n"
     data += rsa.get_public_key_base64()
-    return render_template("qr-code.html", qrcode_img=qrcode(data), device_name=server.device_name, is_running=server.isRunning)
+    return render_template("qr-code.html", qrcode_img=qrcode(data), device_name=server.device_name,
+                           is_running=server.isRunning)
 
 
-@app.route("/manage-files")
-def manage_files():
-    return render_template("manage-files.html", device_name=server.device_name, is_running=server.isRunning)
+@app.route("/manage-folders")
+def manage_folders():
+    return render_template("manage-folders.html", device_name=server.device_name, is_running=server.isRunning)
+
 
 @app.route("/add_folder", methods=["GET"])
 def add_folder():
-
     import tkinter as tk
     from tkinter import filedialog
 
@@ -57,11 +58,9 @@ def add_folder():
 
     folder_path = filedialog.askdirectory()
 
-
     server.add_folder(folder_path)
 
-    return "ok",200
-
+    return "ok", 200
 
 
 @app.route("/add_device")
@@ -74,17 +73,19 @@ def add_device():
 @app.route('/disconnect')
 def disconnect():
     server.disconnect()
-    return "ok",200
+    return "ok", 200
+
 
 @app.route('/device_update_keys')
 def update_keys():
     server.update_keys()
-    return "ok",200
+    return "ok", 200
+
 
 @app.route('/remove_device')
 def remove_device():
     server.remove_device()
-    return "ok",200
+    return "ok", 200
 
 
 def run():
