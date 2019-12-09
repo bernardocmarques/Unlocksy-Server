@@ -58,6 +58,9 @@ def add_folder():
 
     folder_path = filedialog.askdirectory()
 
+    if not folder_path: # no folder path stop
+        return "ok",200 
+
     server.add_folder(folder_path)
 
     return "ok", 200
