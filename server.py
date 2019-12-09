@@ -160,9 +160,19 @@ class BT_Server:
             else:
                 nr_try = 0
 
+    def disconnect(self):
+        self.lockdown()
+
+    def unlock_folders(self):
+        self.request_master_key()
+        files_client.unlock_with_device(self.device_address, self.master_key)
+
     def run_server(self):
         self.isRunning = True
         self.server_socket, self.client_socket = self.create_server()
+
+        # start thread to unlock folders
+        threading.Thread(target=self.unlock_folders).start()
 
         while self.isRunning:
             try:
@@ -185,7 +195,10 @@ class BT_Server:
                 self.device_name = ""
                 self.master_key= None
 
+                files_client.lockdown()
+
                 self.server_socket, self.client_socket = self.create_server()
+                threading.Thread(target=self.unlock_folders).start()
             except KeyboardInterrupt:
                 self.isConnected = False
                 self.isRunning = False
@@ -207,12 +220,12 @@ class BT_Server:
     def add_device(self):
         self.send_cmd("RGK")
 
-    def get_master_key(self):
+    def request_master_key(self):
         '''
         FIXME check if the variable should not stay in memory
         '''
         self.master_key = None 
-        self.send_cmd("RK")
+        self.send_cmd("RGK")
 
         while not self.master_key:
             time.sleep(0.25)
@@ -223,16 +236,18 @@ class BT_Server:
             raise DeviceNotConnected()
         
         if not self.master_key:
-            self.get_master_key()
+            self.request_master_key()
         
 
         files_client.register_new_directory(path,self.device_address,self.master_key)
 
-        pass
     def list_folders(self):
         return files_client.list_directories()
-    def remove_folder(self,folder_path):
-        pass
+    def remove_folder(self,path):
+        if not self.isConnected or not self.device_address:
+            raise DeviceNotConnected()
+
+        files_client.remove_folder(path,self.device_address,self.master_key)
 
     def execute_cmd(self, cmd):
         cmd = self.validate_bluetooth_message(cmd)
@@ -248,14 +263,14 @@ class BT_Server:
 
         if cmd == 'SGK':
             print("SGK - Send Generated Keychain-Key\n")
-            self.master_key = args[0]
-            print("key: " + self.master_key)
+            self.master_key = base64.b64decode(args[0])
+            print(f"key: {self.master_key}")
             self.send_ack(cmd)
 
         elif cmd == 'SNK':
             print("SNK - Send New Generated Keychain-Key\n")
-            self.master_key = args[0]
-            print("key: " + self.master_key)
+            self.master_key = base64.b64decode(args[0])
+            print(f"key: {self.master_key}")
             self.send_ack(cmd)
 
 

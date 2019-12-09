@@ -71,6 +71,11 @@ def add_device():
     return "ok", 200
 
 
+@app.route('/disconnect')
+def disconnect():
+    server.disconnect()
+    return "ok",200
+
 def run():
     if not server.isRunning:
         threading.Thread(target=server.run_server).start()

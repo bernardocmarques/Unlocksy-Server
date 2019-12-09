@@ -139,3 +139,8 @@ body {
 .wrapper .go-back span:hover {
   text-decoration: underline;
 }
+
+#disconnect{
+  background-color: #CB6F63;
+  border-color: #CB6F63;
+}

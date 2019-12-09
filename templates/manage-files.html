@@ -62,7 +62,7 @@
         <!-- files -->
         <!-- TODO files -->
         <!-- buttons -->
-        <a class="btn btn-lg btn-primary shadow my-3" onclick="makeHttpRequest('{{ url_for('add_folder') }}')">Add Folder</a>
+        <a class="btn btn-lg btn-primary shadow my-3" onclick="makeHttpRequest('{{ url_for('add_folder') }}');window.location.reload();">Add Folder</a>
         <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('qr_code') }}">Remove Folder</a>
 
 

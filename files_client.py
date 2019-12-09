@@ -237,6 +237,7 @@ def unlock_with_device(mac,master_key):
     '''
     needs testing
     '''
+    print('UNLOCK FILES')
     config = CONFIG().get_config()
 
     for path in config['directories'].keys():
@@ -252,6 +253,7 @@ def lockdown():
     encripts back everything from config
     :return:
     '''
+    print('ENCRYPT FILES')
     config = CONFIG().get_config()
 
     for directory in config['directories'].keys():
@@ -316,6 +318,10 @@ def update_keys(mac, old_master_key, new_master_key):
         except keystore.NoKeyError:
             # phone doesnt have key, try next key
             continue
+
+# def share_key(path,mac_orig,key_orig,mac_dest,key_dest):
+
+
 
 def _check_if_already_mounted(directory,enc_directory):
     p = subprocess.run(shlex.split('mount'),stdout=subprocess.PIPE)
