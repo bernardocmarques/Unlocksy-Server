@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <meta http-equiv="refresh" content="5">
+{#        <meta http-equiv="refresh" content="5">#} <!-- fixme  -->
     <title>Manage files</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="../static/css/main.css">
 
     <script src="https://kit.fontawesome.com/c9518678ef.js" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 
 </head>
 <body>
@@ -59,14 +60,130 @@
             </div>
         {% endif %}
 
-        <!-- files -->
-        <!-- TODO files -->
+        <!-- folders -->
+        <ul class="list-group list-group-flush scrollbar mb-4">
+{#            {% for folder in folders %} <!-- TODO -->#}
+{#                <li class="list-group-item list-top">#}
+{#                    <span class="mr-5">State</span>#}
+{#                    <span>Folder path</span>#}
+{#                    <span class="float-right">Remove</span>#}
+{#                </li>#}
+{#                <li class="list-group-item">#}
+{#                    <button class="mr-5"> #}
+{#                        {% if is_locked == True %}#}
+{#                            <i class="fas fa-lock locked"></i>#}
+{#                        {% else %}#}
+{#                            <i class="fa-lock-open unlocked"></i>#}
+{#                        {% endif %}#}
+{#                    </button>#}
+{#                    <button> <span class="folder-path">{{ folder_path }}</span> </button>#}
+{#                    <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>#}
+{#                </li>#}
+{#            {% endfor %}#}
+
+
+            <!-- FIXME apagar isto e ficar só com aquilo em cima -->
+            <li class="list-group-item list-top">
+                <span class="mr-5">State</span>
+                <span>Folder path</span>
+                <span class="float-right">Remove</span>
+            </li>
+            <li class="list-group-item">
+                <button class="mr-5"> <i class="fas fa-lock locked"></i> </button>
+                <button> <span class="folder-path">http://www.groovestreet.com</span> </button>
+                <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>
+            </li>
+            <li class="list-group-item">
+                <button class="mr-5"> <i class="fas fa-lock-open unlocked"></i> </button>
+                <button> <span class="folder-path">http://www.groovestreet.com</span> </button>
+                <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>
+            </li>
+            <li class="list-group-item">
+                <button class="mr-5"> <i class="fas fa-lock-open unlocked"></i> </button>
+                <button> <span class="folder-path">http://www.groovestreet.com</span> </button>
+                <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>
+            </li>
+            <li class="list-group-item">
+                <button class="mr-5"> <i class="fas fa-lock locked"></i> </button>
+                <button> <span class="folder-path">http://www.groovestreet.com</span> </button>
+                <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>
+            </li>
+            <li class="list-group-item">
+                <button class="mr-5"> <i class="fas fa-lock-open unlocked"></i> </button>
+                <button> <span class="folder-path">http://www.groovestreet.com</span> </button>
+                <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>
+            </li>
+            <li class="list-group-item">
+                <button class="mr-5"> <i class="fas fa-lock-open unlocked"></i> </button>
+                <button> <span class="folder-path">http://www.groovestreet.com</span> </button>
+                <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>
+            </li>
+            <li class="list-group-item">
+                <button class="mr-5"> <i class="fas fa-lock locked"></i> </button>
+                <button> <span class="folder-path">http://www.groovestreet.com</span> </button>
+                <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>
+            </li>
+            <li class="list-group-item">
+                <button class="mr-5"> <i class="fas fa-lock-open unlocked"></i> </button>
+                <button> <span class="folder-path">http://www.groovestreet.com</span> </button>
+                <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>
+            </li>
+            <li class="list-group-item">
+                <button class="mr-5"> <i class="fas fa-lock-open unlocked"></i> </button>
+                <button> <span class="folder-path">http://www.groovestreet.com</span> </button>
+                <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>
+            </li>
+            <li class="list-group-item">
+                <button class="mr-5"> <i class="fas fa-lock locked"></i> </button>
+                <button> <span class="folder-path">http://www.groovestreet.com</span> </button>
+                <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>
+            </li>
+            <li class="list-group-item">
+                <button class="mr-5"> <i class="fas fa-lock-open unlocked"></i> </button>
+                <button> <span class="folder-path">http://www.groovestreet.com</span> </button>
+                <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>
+            </li>
+            <li class="list-group-item">
+                <button class="mr-5"> <i class="fas fa-lock-open unlocked"></i> </button>
+                <button> <span class="folder-path">http://www.groovestreet.com</span> </button>
+                <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>
+            </li>
+            <li class="list-group-item">
+                <button class="mr-5"> <i class="fas fa-lock locked"></i> </button>
+                <button> <span class="folder-path">http://www.groovestreet.com</span> </button>
+                <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>
+            </li>
+            <!-- FIXME até aqui -->
+        </ul>
+
+        <a class="btn btn-primary shadow my-3" href="#">Add folder</a>
 
         <!-- go back -->
-        <a class="d-inline-flex go-back align-items-center" href="{{ url_for('home') }}">
+        <a class="d-inline-flex go-back align-items-center mb-3" href="{{ url_for('home') }}">
             <i class="fas fa-undo-alt mr-2"></i>
             <span>go back</span>
         </a>
+    </div>
+
+    <!-- modal -->
+    <div class="modal fade" id="removeFolderModal" tabindex="-1" role="dialog" aria-labelledby="removeFolderModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="removeFolderModalLabel">Remove folder</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Do you really want to remove this folder?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+            <button type="button" class="btn btn-primary">Yes, I want to remove</button>
+          </div>
+        </div>
+      </div>
     </div>
     
 </body>

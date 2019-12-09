@@ -1,5 +1,4 @@
 $(document).ready(function(){
-    console.log("entrou");
 
     // ===============================================
     //                  ALERT TYPES
@@ -41,10 +40,11 @@ $(document).ready(function(){
 function makeHttpRequest(url) {
 
         const Http = new XMLHttpRequest();
+
         Http.open("GET", url);
         Http.send();
 
         Http.onreadystatechange = (e) => {
             console.log(Http.responseText)
         }
-    }
+}
