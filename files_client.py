@@ -78,7 +78,7 @@ def _try_copy_files_to_temp_location(path):
 
 def _generate_unique_name(path, create_folder=True):
     while True:
-        random_name = _randomString(24)
+        random_name = "backup_"+_randomString(20)
         encrypted_path = f'{path}/{random_name}'
         if not os.path.exists(encrypted_path):
 
