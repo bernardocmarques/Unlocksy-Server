@@ -81,6 +81,12 @@ def update_keys():
     server.update_keys()
     return "ok",200
 
+@app.route('/remove_device')
+def remove_device():
+    server.remove_device()
+    return "ok",200
+
+
 def run():
     if not server.isRunning:
         threading.Thread(target=server.run_server).start()

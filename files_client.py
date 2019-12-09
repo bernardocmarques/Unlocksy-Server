@@ -42,7 +42,6 @@ import secrets
 import shutil
 import Crypto.Random
 
-
 from config import CONFIG
 import keystore
 
@@ -308,16 +307,38 @@ def update_keys(mac, old_master_key, new_master_key):
     config = CONFIG().get_config()
 
     for path in config['directories'].keys():
-        # will try to decrypt
-        try:
-            file_key = keystore.get_key(path,mac,old_master_key)
 
-            #update
-            keystore.set_key(path,mac, new_master_key,file_key)
+        if _check_if_already_mounted(path,config['directories'][path]['enc_path']): #our way of knowing if the key is right
+            try:
+                file_key = keystore.get_key(path,mac,old_master_key)
+    
+                #update
+                keystore.set_key(path,mac, new_master_key,file_key)
+    
+            except keystore.NoKeyError:
+                # phone doesnt have key, try next key
+                raise Exception(f"Is mounted but has no access to it! mount:{path}, enc path:{config['directories'][path]['enc_path']}")
 
-        except keystore.NoKeyError:
-            # phone doesnt have key, try next key
-            continue
+
+def remove_device(mac,master_key):
+    config = CONFIG().get_config()
+
+    for path in config['directories'].keys():
+        # check if user has real key
+        if _check_if_already_mounted(path,config['directories'][path]['enc_path']): #our way of knowing if the key is right
+            try:
+                file_key = keystore.get_key(path,mac,master_key)
+    
+                #update
+                keystore.delete_key(path,mac) #thors error but should have
+
+            except keystore.PasswordDeleteError:
+                raise Exception(f"Something is wrong! Have the key, but cant delete. mount:{path}, enc path:{config['directories'][path]['enc_path']},mac:{mac}")
+
+
+            except keystore.NoKeyError:
+                # phone doesnt have key, try next key
+                raise Exception(f"Is mounted but has no access to it! mount:{path}, enc path:{config['directories'][path]['enc_path']},mac:{mac}")
 
 
 

@@ -175,6 +175,9 @@ class BT_Server:
 
         files_client.update_keys(self.device_address, old_master_key, self.master_key)
 
+    def remove_device(self):
+        files_client.remove_device(self.device_address,self.master_key)
+
     def run_server(self):
         self.isRunning = True
         self.server_socket, self.client_socket = self.create_server()
