@@ -230,7 +230,6 @@ class BT_Server:
         while not self.master_key:
             time.sleep(0.25)
         
-        
     def add_folder(self,path):
         if not self.isConnected or not self.device_address:
             raise DeviceNotConnected()

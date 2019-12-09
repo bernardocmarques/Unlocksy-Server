@@ -21,3 +21,8 @@ def get_key(abs_path,mac,master_key):
     except UnicodeDecodeError:
         # wrong key
         return NoKeyError('No key in keystore')
+
+def share_keys(path,mac_orig,key_orig,mac_dest,key_dest):
+    file_key=get_key(path,mac_orig,key_orig)
+
+    set_key(path,mac_dest,key_dest,file_key)
