@@ -76,6 +76,11 @@ def disconnect():
     server.disconnect()
     return "ok",200
 
+@app.route('/device_update_keys')
+def update_keys():
+    server.update_keys()
+    return "ok",200
+
 def run():
     if not server.isRunning:
         threading.Thread(target=server.run_server).start()

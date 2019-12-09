@@ -319,7 +319,6 @@ def update_keys(mac, old_master_key, new_master_key):
             # phone doesnt have key, try next key
             continue
 
-# def share_key(path,mac_orig,key_orig,mac_dest,key_dest):
 
 
 

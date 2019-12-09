@@ -166,6 +166,14 @@ class BT_Server:
     def unlock_folders(self):
         self.request_master_key()
         files_client.unlock_with_device(self.device_address, self.master_key)
+    
+    def update_keys(self):
+        old_master_key = self.master_key
+
+        # ask for new key
+        self.request_generate_new_master_key()
+
+        files_client.update_keys(self.device_address, old_master_key, self.master_key)
 
     def run_server(self):
         self.isRunning = True
@@ -229,7 +237,17 @@ class BT_Server:
 
         while not self.master_key:
             time.sleep(0.25)
-        
+
+    def request_generate_new_master_key(self):
+        '''
+        FIXME check if the variable should not stay in memory
+        '''
+        self.master_key = None 
+        self.send_cmd("RNK")
+
+        while not self.master_key:
+            time.sleep(0.25)
+
     def add_folder(self,path):
         if not self.isConnected or not self.device_address:
             raise DeviceNotConnected()
