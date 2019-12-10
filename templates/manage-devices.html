@@ -62,7 +62,7 @@
 
         <!-- buttons -->
         {% if device_name != '' %}
-        <button class="btn btn-lg btn-primary shadow my-3" type="button" onclick="makeHttpRequest('{{ url_for('remove_device') }}');">Remove device</button>
+        <button class="btn btn-lg btn-primary shadow my-3" type="button" onclick="makeHttpRequest('{{ url_for('remove_device') }}');">Revoke Device</button>
         <button class="btn btn-lg btn-primary shadow my-3" type="button" onclick="makeHttpRequest('{{ url_for('update_keys') }}');">Update Device Keys</button>
         {% endif %}
         <!-- go back -->

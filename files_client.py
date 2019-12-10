@@ -429,6 +429,9 @@ def list_directories_device(device_mac,master_key):
 
     return dic
 
+def list_mac_devices():
+    return CONFIG().get_config()['devices']
+
 class ErrorDecrypt(Exception):
     pass
 

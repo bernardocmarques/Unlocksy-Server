@@ -111,10 +111,10 @@ def update_keys():
     return "ok", 200
 
 
-# @app.route('/remove_device')
-# def remove_device():
-#     server.remove_device()
-#     return "ok", 200
+@app.route('/remove_device')
+def remove_device():
+    server.remove_device()
+    return "ok", 200
 
 @app.route("/remove_folder", methods=["GET"])
 def remove_folder():

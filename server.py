@@ -2,6 +2,7 @@ import time
 import subprocess
 from datetime import datetime
 import random
+import easygui
 
 from bluetooth import *
 from AES_Util import *
@@ -184,7 +185,13 @@ class BT_Server:
         files_client.update_keys(self.device_address, old_master_key, self.master_key)
 
     def remove_device(self):
-        files_client.remove_device(self.device_address, self.master_key)
+
+        msg ="Which phone mac address do you want to revoke?\nPlease pick a mac address:"
+        title = "Choose mac address to revoke acess"
+        mac_devices = files_client.list_mac_devices()
+        choice = easygui.choicebox(msg, title, mac_devices)
+        if choice:
+            files_client.remove_device(self.device_address, self.master_key,choice)
 
     def run_server(self):
         self.isRunning = True
