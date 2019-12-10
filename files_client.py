@@ -414,7 +414,7 @@ def list_directories():
 
     dic = {}
     for directory in config['directories'].keys():
-        dic[directory] = _check_if_mounted(directory, config['directories'][directory])
+        dic[directory] = not _check_if_mounted(directory, config['directories'][directory]['enc_path'])
 
     return dic
 
@@ -425,7 +425,7 @@ def list_directories_device(device_mac,master_key):
     print(tuple(config['directories']))
     for directory in config['directories'].keys():
         if _if_device_has_folder_insecure(directory,device_mac,master_key):
-            dic[directory] = _check_if_mounted(directory, config['directories'][directory])
+            dic[directory] = not _check_if_mounted(directory, config['directories'][directory]['enc_path'])
 
     return dic
 

@@ -174,7 +174,8 @@ class BT_Server:
 
     def unlock_folders(self):
         print('UNLOCK ALL FOLDERS')
-        self.request_master_key()
+        if not self.master_key:
+            self.request_master_key()
         files_client.unlock_with_device(self.device_address, self.master_key)
 
     def update_keys(self):
