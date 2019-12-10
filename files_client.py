@@ -297,6 +297,11 @@ def remove_folder(path,mac, master_key):
 
         # remove file_key from all other devices with this folder
         _remove_keyring_from_all_macs(path)
+
+        # remove from config folder
+        config = CONFIG().get_config()
+        config['directories'].pop(path, None)
+        CONFIG().set_config(config)  # update config
         return True
     else:
         return False
