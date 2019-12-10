@@ -70,6 +70,7 @@ def add_folder():
     root.withdraw()
 
     folder_path = filedialog.askdirectory()
+    root.destroy()
 
     if not folder_path:  # no folder path stop
         return "ok", 200

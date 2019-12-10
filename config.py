@@ -6,10 +6,9 @@ from copy import deepcopy
 from utils import Singleton
 
 
-class CONFIG(metaclass=Singleton):
-    # FIXME should be absoulute or something else I guess
+CURRENT_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-    CURRENT_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
+class CONFIG(metaclass=Singleton):
 
     PATH = f'{CURRENT_SCRIPT_PATH}/config.json'
 

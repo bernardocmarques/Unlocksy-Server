@@ -107,7 +107,7 @@ def _mount_directory(directory, enc_directory, key):
     shell_env["CRYFS_FRONTEND"] = "noninteractive"
 
     p = subprocess.run(shlex.split(
-        f'cryfs {enc_directory} {directory}'),
+        f'cryfs "{enc_directory}" "{directory}"'),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         input=f'{key}\n',
@@ -130,7 +130,7 @@ def _try_umount_directory(directory):
     if _check_if_mounted(directory, CONFIG().get_config()['directories'][directory]['enc_path']):
         p = subprocess.run(shlex.split(
             # f'sudo {CURRENT_SCRIPT_PATH + "/utils/umount.sh"} {directory}'),
-            f' fusermount -u {directory}'),
+            f' fusermount -u "{directory}"'),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             encoding='ascii')
