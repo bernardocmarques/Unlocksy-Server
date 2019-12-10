@@ -41,23 +41,23 @@ def get_mac():
     return bt_mac
 
 
-def qr_code(mode):
+def get_qr_code_data(mode):
     data = get_mac() + "\n"
     data += rsa.get_public_key_base64() + "\n"
     data += mode
-    return render_template("qr-code.html", qrcode_img=qrcode(data), device_name=server.device_name,
-                           is_running=server.isRunning)
+    return data
 
 
 @app.route("/qr-code", methods=["GET"])
 def qr_code_normal():
-    return qr_code("normal")
+    return render_template("qr-code.html", qrcode_img=qrcode(get_qr_code_data("normal")),
+                           device_name=server.device_name, is_running=server.isRunning)
 
 
 @app.route("/qr-code-share", methods=["GET"])
 def qr_code_share():
-    threading.Thread(target=server.create_server_sharing).start()
-    return qr_code("share")
+    return render_template("qr-code-share.html", qrcode_img=qrcode(get_qr_code_data("share")),
+                           is_running=server.isRunning)
 
 
 @app.route("/manage-folders")
@@ -68,7 +68,23 @@ def manage_folders():
 
 @app.route("/share-folders")
 def share_folders():
-    return render_template("share-folders.html", device_name=server.device_name, is_running=server.isRunning)
+    return render_template("share-folders.html", device_name=server.device_name,
+                           device_to_share_name=server.device_name_to_share, is_running=server.isRunning,
+                           folders=server.list_folders())
+
+
+@app.route("/wait-for-share")
+def wait_for_share():
+    server.create_server_sharing()
+    return "ok", 200
+
+
+@app.route("/share-folders-list")
+def share_folders_list():
+    args = request.args
+    list_str = args.get("list")
+    print(list_str)
+    return "ok", 200
 
 
 @app.route("/add_folder", methods=["GET"])
@@ -99,7 +115,7 @@ def add_folder():
 @app.route('/unlock_all_folders')
 def unlock_all_folders():
     server.unlock_folders()
-    return "ok",200
+    return "ok", 200
 
 
 @app.route('/disconnect')
@@ -118,6 +134,7 @@ def update_keys():
 def remove_device():
     server.remove_device()
     return "ok", 200
+
 
 @app.route("/remove_folder", methods=["GET"])
 def remove_folder():

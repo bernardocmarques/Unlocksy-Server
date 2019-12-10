@@ -16,6 +16,10 @@ class Lockdown(Exception):
     pass
 
 
+class StopWaitingForShare(Exception):
+    pass
+
+
 class DeviceNotConnected(Exception):
     pass
 
@@ -55,8 +59,8 @@ class BT_Server:
         self.isRunning = False
         self.isConnected = False
 
-        self.device_address = ""
-        self.device_name = ""
+        self.device_address = None
+        self.device_name = None
 
         self.device_address_to_share = None
         self.device_name_to_share = None
@@ -101,8 +105,8 @@ class BT_Server:
             print("Closing connection & restarting...\n\n")
             client_sock.close()
             server_sock.close()
-            self.device_name = ""
-            self.device_address = ""
+            self.device_name = None
+            self.device_address = None
             return self.create_server()
 
         self.isConnected = True
@@ -188,12 +192,12 @@ class BT_Server:
 
     def remove_device(self):
 
-        msg ="Which phone mac address do you want to revoke?\nPlease pick a mac address:"
+        msg = "Which phone mac address do you want to revoke?\nPlease pick a mac address:"
         title = "Choose mac address to revoke acess"
         mac_devices = files_client.list_mac_devices()
         choice = easygui.choicebox(msg, title, mac_devices)
         if choice:
-            files_client.remove_device(self.device_address, self.master_key,choice)
+            files_client.remove_device(self.device_address, self.master_key, choice)
 
     def run_server(self):
         self.isRunning = True
@@ -220,8 +224,8 @@ class BT_Server:
                 self.client_socket.close()
                 self.server_socket.close()
 
-                self.device_address = ""
-                self.device_name = ""
+                self.device_address = None
+                self.device_name = None
                 self.master_key = None
 
                 files_client.lockdown()
@@ -235,8 +239,8 @@ class BT_Server:
         print("Closing connection....")
         self.client_socket.close()
         self.server_socket.close()
-        self.device_address = ""
-        self.device_name = ""
+        self.device_address = None
+        self.device_name = None
         print("Connection closed.\n\n")
 
     def send_cmd(self, cmd):
@@ -295,12 +299,12 @@ class BT_Server:
     def list_folders(self):
         if not self.master_key:
             self.request_master_key()
-        return files_client.list_directories_device(self.device_address,self.master_key)
+        return files_client.list_directories_device(self.device_address, self.master_key)
 
     def remove_folder(self, path):
         if not self.isConnected or not self.device_address:
             raise DeviceNotConnected()
-            
+
         if not self.master_key:
             self.request_master_key()
 
@@ -353,17 +357,25 @@ class BT_Server:
 
     def create_server_sharing(self):
         if not self.isRunning:
+            print("Main server not running!")
             return
+
+        self.device_address_to_share = None
+        self.device_name_to_share = None
 
         self.is_waiting_for_share = True
         try:
             print("Waiting device to share")  # fixme find way to timeout
-            advertise_service(self.server_socket, self.server_name, self.server_uuid)  # fixme if not connecting probs the error is where
+            advertise_service(self.server_socket, self.server_name,
+                              self.server_uuid)  # fixme if not connecting probs the error is where
             client_sock_second, address = self.server_socket.accept()
             stop_advertising(self.server_socket)
-        except Exception as e:
-            print("entra")
-            # return self.create_server_sharing()
+        except StopWaitingForShare:
+            print("Stopped waiting for share device key")
+            return
+        except Exception:
+            print("Error second device")
+            return
 
         if self.is_waiting_for_share:  # fixme change if no timeout
             self.device_address_to_share = address[0]
@@ -382,9 +394,3 @@ class BT_Server:
                 return self.create_server_sharing()
 
             client_sock_second.close()
-        else:  # fixme change if no timeout
-            print("Stopped waiting for share device key")
-            self.device_address_to_share = None
-            self.device_name_to_share = None
-
-

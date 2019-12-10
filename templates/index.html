@@ -48,7 +48,7 @@
         <span class="device-name ml-3">{{ server_running }}</span>
 
         <!-- connected -->
-        {% if device_name != '' %}
+        {% if device_name != None %}
             <div class="d-inline-flex justify-content-center align-items-center connected mb-4">
                 <img class="BT-icon" src="../static/assets/BT-green.svg" alt="">
                 <span class="device-name ml-3">{{ device_name }}</span>
@@ -56,7 +56,7 @@
         {% endif %}
 
         <!-- disconnected -->
-        {% if device_name == '' %}
+        {% if device_name == None %}
             <div class="d-inline-flex justify-content-center align-items-center disconnected mb-4">
                 <img class="BT-icon" src="../static/assets/BT-red.svg" alt="">
                 <span class="ml-3">Not connected</span>
@@ -64,11 +64,11 @@
         {% endif %}
 
         <!-- buttons -->
-        {% if device_name != '' %}
+        {% if device_name != None %}
             <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('manage_devices') }}">Manage devices</a>
         {% endif %}
         <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('qr_code_normal') }}">Read QR code</a>
-        {% if device_name != '' %}
+        {% if device_name != None %}
             <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('manage_folders') }}">Manage folders</a>
             <a id="disconnect" class="btn btn-lg btn-primary shadow my-3" onclick="makeHttpRequest('{{ url_for('disconnect') }}');">Disconnect</a>
         {% endif %}

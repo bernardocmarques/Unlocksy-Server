@@ -47,14 +47,14 @@
         <!-- devices -->
         <div class="devices d-inline-flex justify-content-center align-items-center mb-4">
             <!-- 1st device -->
-            {% if device_name != '' %}
+            {% if device_name != None %}
                 <div class="d-inline-flex justify-content-center align-items-center connected mr-5">
                  <img class="BT-icon" src="../static/assets/BT-green.svg" alt="">
                     <span class="device-name ml-3">{{ device_name }}</span>
                 </div>
             {% endif %}
 
-            {% if device_name == '' %}
+            {% if device_name == None %}
                 <div class="d-inline-flex justify-content-center align-items-center disconnected mr-5">
                     <img class="BT-icon" src="../static/assets/BT-red.svg" alt="">
                     <span class="ml-3">Not connected</span>
@@ -62,15 +62,15 @@
             {% endif %}
 
             <!-- 2nd device -->
-            {% if device_name != '' %} <!-- FIXME change to 2nd device -->
-                <div class="d-inline-flex justify-content-center align-items-center connected">
+            {% if device_to_share_name != None %} <!-- FIXME change to 2nd device -->
+                <div id = "secondDevice" class="d-inline-flex justify-content-center align-items-center connected">
                  <img class="BT-icon" src="../static/assets/BT-green.svg" alt="">
-                    <span class="device-name ml-3">{{ device_name }}</span>  <!-- FIXME change to 2nd device -->
+                    <span class="device-name ml-3">{{ device_to_share_name }}</span>  <!-- FIXME change to 2nd device -->
                 </div>
             {% endif %}
 
-            {% if device_name == '' %} <!-- FIXME change to 2nd device -->
-                <div class="d-inline-flex justify-content-center align-items-center disconnected">
+            {% if device_to_share_name == None %} <!-- FIXME change to 2nd device -->
+                <div id = "secondDevice" class="d-inline-flex justify-content-center align-items-center disconnected">
                     <img class="BT-icon" src="../static/assets/BT-red.svg" alt="">
                     <span class="ml-3">Not connected</span>
                 </div>
@@ -79,83 +79,23 @@
 
         <!-- folders -->
         <ul class="list-group list-group-flush scrollbar mb-4">
-{#            {% for folder in folders %} <!-- TODO -->#}
-{#                <li class="list-group-item list-top">#}
-{#                    <span class="mr-5">Share</span>#}
-{#                    <span>Folder path</span>#}
-{#                </li>#}
-{#                <li class="list-group-item">#}
-{#                    <div class="custom-control custom-checkbox">#}
-{#                      <input type="checkbox" class="custom-control-input" id="check1">#} <!-- TODO id inscrementais -->
-{#                      <label class="custom-control-label folder-path" for="check1" onclick="showShareBtn('check1')">{{ folder_path }}</label>#}  <!-- TODO for = ids -->
-{#                    </div>#}
-{#                </li>#}
-{#            {% endfor %}#}
-
-
-            <!-- FIXME apagar isto e ficar só com aquilo em cima -->
             <li class="list-group-item list-top">
                 <span class="mr-5">Share</span>
                 <span>Folder path</span>
             </li>
-            <li class="list-group-item">
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="check1">
-                    <label class="custom-control-label folder-path" for="check1" onclick="showShareBtn('check1')">http://www.groovestreet.com</label>
-                </div>
-            </li>
-            <li class="list-group-item">
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="check2">
-                    <label class="custom-control-label folder-path" for="check2" onclick="showShareBtn('check2')">http://www.groovestreet.com</label>
-                </div>
-            </li>
-            <li class="list-group-item">
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="check3">
-                    <label class="custom-control-label folder-path" for="check3" onclick="showShareBtn('check3')">http://www.groovestreet.com</label>
-                </div>
-            </li>
-            <li class="list-group-item">
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="check4">
-                    <label class="custom-control-label folder-path" for="check4" onclick="showShareBtn('check4')">http://www.groovestreet.com</label>
-                </div>
-            </li>
-            <li class="list-group-item">
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="check5">
-                    <label class="custom-control-label folder-path" for="check5" onclick="showShareBtn('check5')">http://www.groovestreet.com</label>
-                </div>
-            </li>
-            <li class="list-group-item">
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="check6">
-                    <label class="custom-control-label folder-path" for="check6" onclick="showShareBtn('check6')">http://www.groovestreet.com</label>
-                </div>
-            </li>
-            <li class="list-group-item">
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="check7">
-                    <label class="custom-control-label folder-path" for="check7" onclick="showShareBtn('check7')">http://www.groovestreet.com</label>
-                </div>
-            </li>
-            <li class="list-group-item">
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="check8">
-                    <label class="custom-control-label folder-path" for="check8" onclick="showShareBtn('check8')">http://www.groovestreet.com</label>
-                </div>
-            </li>
-            <li class="list-group-item">
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="check9">
-                    <label class="custom-control-label folder-path" for="check9" onclick="showShareBtn('check9')">http://www.groovestreet.com</label>
-                </div>
-            </li>
-            <!-- FIXME até aqui -->
+
+            {% for folder in folders %}
+                <li class="list-group-item">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="{{ loop.index }}"> <!-- TODO id inscrementais -->
+                      <label class="custom-control-label folder-path checkbox_share" for="{{ loop.index }}" onclick="showShareBtn('{{ loop.index }}')">{{ folder }}</label>  <!-- TODO for = ids -->
+                    </div>
+                </li>
+            {% endfor %}
+
         </ul>
 
-        <button type="submit" id="share" class="btn btn-outline-primary invisible">Share</button>
+        <button type="submit" id="share" class="btn btn-outline-primary invisible" onclick="shareFolders()">Share</button>
 
         <a class="btn btn-primary shadow my-3" href="{{ url_for('qr_code_share') }}">Show QR code</a>
 

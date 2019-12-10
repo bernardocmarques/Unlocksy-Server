@@ -119,6 +119,11 @@ body {
   color: #CB6F63;
 }
 
+.wrapper .info span {
+  font-size: 1.2rem;
+  color: white;
+}
+
 .wrapper .qr-code {
   background-color: white;
 }
