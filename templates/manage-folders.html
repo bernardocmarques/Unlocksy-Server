@@ -77,7 +77,7 @@
                         {% endif %}
                     </button>
                     <button> <span class="folder-path">{{ folder }}</span> </button>
-                    <button class="float-right" data-toggle="modal" data-target="#removeFolderModal"> <i class="fas fa-minus remove-folder"></i> </button>
+                    <button class="float-right" data-toggle="modal" data-target="#removeFolderModal" onclick="setRemovePath('{{ folder }}');"> <i class="fas fa-minus remove-folder"></i> </button>
                 </li>
             {% endfor %}
 
@@ -180,7 +180,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-            <button type="button" class="btn btn-primary">Yes, I want to remove</button>
+            <button type="button" class="btn btn-primary" onclick="makeHttpRequest('{{ url_for('remove_folder') }}'+'?remove_path='+remove_path);">Yes, I want to remove</button>
           </div>
         </div>
       </div>
@@ -188,4 +188,11 @@
 
 </body>
 <script src="../static/js/main.js"></script>
+<script>
+    var remove_path='';
+
+    function setRemovePath(path){
+        remove_path=path;
+    }
+</script>
 </html>

@@ -295,6 +295,7 @@ def remove_folder(path,mac, master_key):
 
         return True
     else:
+        print('Device does not have folder')
         return False
 
 
@@ -356,11 +357,11 @@ def _if_device_has_folder_secure(path,mac,master_key, umount=False):
     if path not in config['directories'].keys():
         return False
 
-    encrypted_path = config['directories'][path]
-
+    encrypted_path = config['directories'][path]['enc_path']
+    print(encrypted_path)
     try:
         file_key = keystore.get_key(path,mac,master_key)
-
+        print('if_folder_secure HAS FILE KEY')
         if _check_if_mounted(path,encrypted_path): #ent o device ja tem ownership
 
             if umount:
@@ -375,9 +376,11 @@ def _if_device_has_folder_secure(path,mac,master_key, umount=False):
 
             return True
     except keystore.NoKeyError:
+        print('NoKeuERROR')
         return False # nao tem a chave
 
     except ErrorDecrypt:
+        print('ErrorDecrypt')
         return False
 
 def _if_device_has_folder_insecure(path,mac,master_key):

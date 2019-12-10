@@ -8,6 +8,7 @@ import time
 
 import tkinter as tk
 from tkinter import filedialog
+import easygui
 
 from RSA_Util import *
 from bluetooth import *
@@ -72,8 +73,6 @@ def share_folders():
 
 @app.route("/add_folder", methods=["GET"])
 def add_folder():
-    print("fdsfdassadf")
-
     root = tk.Tk()
     root.withdraw()
     folder_path = filedialog.askdirectory()
@@ -82,17 +81,22 @@ def add_folder():
     if not folder_path:  # no folder path stop
         return "ok", 200
 
-    server.add_folder(folder_path)
+    proceed = easygui.ccbox(f"Are you sure you want to encrypt: {folder_path}",title='Confirm path folder') 
 
-    time.sleep(5)
-    return manage_folders()
+    if proceed:
+        server.add_folder(folder_path)
+    
+        return "ok", 200
+    else:
+        return "ok", 200
 
 
-@app.route("/add_device")
-def add_device():
-    print("here")
-    server.add_device()
-    return "ok", 200
+
+# @app.route("/add_device")
+# def add_device():
+#     print("here")
+#     server.add_device()
+#     return "ok", 200
 
 
 @app.route('/disconnect')
@@ -107,11 +111,25 @@ def update_keys():
     return "ok", 200
 
 
-@app.route('/remove_device')
-def remove_device():
-    server.remove_device()
-    return "ok", 200
+# @app.route('/remove_device')
+# def remove_device():
+#     server.remove_device()
+#     return "ok", 200
 
+@app.route("/remove_folder", methods=["GET"])
+def remove_folder():
+    remove_path = request.args.get("remove_path")
+    print(f"Removing encryption from {remove_path}")
+
+    if not remove_path:
+        return 'invalid path',403
+    
+    resp = server.remove_folder(remove_path)
+
+    if resp:
+        return 'ok',200
+    else:
+        return 'Error on removing', 403
 
 @app.route('/test')
 def test():

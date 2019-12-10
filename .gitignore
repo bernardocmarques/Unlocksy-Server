@@ -10,3 +10,7 @@ config.json
 key
 
 encrypted/
+
+utils/
+
+config2.json

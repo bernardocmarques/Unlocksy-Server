@@ -280,8 +280,11 @@ class BT_Server:
     def remove_folder(self, path):
         if not self.isConnected or not self.device_address:
             raise DeviceNotConnected()
+            
+        if not self.master_key:
+            self.request_master_key()
 
-        files_client.remove_folder(path, self.device_address, self.master_key)
+        return files_client.remove_folder(path, self.device_address, self.master_key)
 
     def execute_cmd(self, cmd):
         cmd = self.validate_bluetooth_message(cmd)

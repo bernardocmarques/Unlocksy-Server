@@ -71,7 +71,7 @@
         <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('qr_code_normal') }}">Read QR code</a>
         {% if device_name != '' %}
             <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('manage_folders') }}">Manage folders</a>
-            <a id="disconnect" class="btn btn-lg btn-primary shadow my-3" onclick="makeHttpRequest('{{ url_for('disconnect') }}'); window.location.reload()">Disconnect</a>
+            <a id="disconnect" class="btn btn-lg btn-primary shadow my-3" onclick="makeHttpRequest('{{ url_for('disconnect') }}');">Disconnect</a>
         {% endif %}
     </div>
     

@@ -6,3 +6,5 @@ keyring
 
 regex
 pytest
+
+easygui
