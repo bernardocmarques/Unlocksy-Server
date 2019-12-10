@@ -81,11 +81,10 @@ def add_folder():
     if not folder_path:  # no folder path stop
         return "ok", 200
 
-    proceed = easygui.ccbox(f"Are you sure you want to encrypt: {folder_path}",title='Confirm path folder') 
+    proceed = easygui.ccbox(f"Are you sure you want to encrypt: {folder_path}",title='Confirm path folder')
 
     if proceed:
         server.add_folder(folder_path)
-    
         return "ok", 200
     else:
         return "ok", 200
@@ -123,7 +122,7 @@ def remove_folder():
 
     if not remove_path:
         return 'invalid path',403
-    
+
     resp = server.remove_folder(remove_path)
 
     if resp:
