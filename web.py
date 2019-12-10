@@ -24,7 +24,6 @@ def home():
 def manage_devices():
     return render_template("manage-devices.html", device_name=server.device_name, is_running=server.isRunning)
 
-
 def get_mac():
     import subprocess
 
@@ -35,17 +34,28 @@ def get_mac():
     return bt_mac
 
 
-@app.route("/qr-code", methods=["GET"])
-def qr_code():
+def qr_code(mode):
     data = get_mac() + "\n"
-    data += rsa.get_public_key_base64()
+    data += rsa.get_public_key_base64() + "\n"
+    data += mode
     return render_template("qr-code.html", qrcode_img=qrcode(data), device_name=server.device_name,
                            is_running=server.isRunning)
 
 
+@app.route("/qr-code", methods=["GET"])
+def qr_code_normal():
+    return qr_code("normal")
+
+
+@app.route("/qr-code-share", methods=["GET"])
+def qr_code_share():
+    threading.Thread(target=server.create_server_sharing).start()
+    return qr_code("share")
+
+
 @app.route("/manage-folders")
 def manage_folders():
-    return render_template("manage-folders.html", device_name=server.device_name, is_running=server.isRunning)
+    return render_template("manage-folders.html", device_name=server.device_name, is_running=server.isRunning, folders=server.list_folders())
 
 @app.route("/share-folders")
 def share_folders():
@@ -61,8 +71,8 @@ def add_folder():
 
     folder_path = filedialog.askdirectory()
 
-    if not folder_path: # no folder path stop
-        return "ok",200 
+    if not folder_path:  # no folder path stop
+        return "ok", 200
 
     server.add_folder(folder_path)
 
@@ -92,6 +102,13 @@ def update_keys():
 def remove_device():
     server.remove_device()
     return "ok", 200
+
+@app.route('/test')
+def test():
+    s=""
+    for e in server.list_folders():
+        s += e + "\n"
+    return s, 200
 
 
 def run():

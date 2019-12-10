@@ -8,7 +8,10 @@ from utils import Singleton
 
 class CONFIG(metaclass=Singleton):
     # FIXME should be absoulute or something else I guess
-    PATH = './config.json'
+
+    CURRENT_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
+
+    PATH = f'{CURRENT_SCRIPT_PATH}/config.json'
 
     default_config = {
         'directories': {}
@@ -48,6 +51,7 @@ class CONFIG(metaclass=Singleton):
     def set_config(self, config):
         self.config = config
         self._save_config()
+
     def reset(self):
         self.config = deepcopy(self.default_config)
         self._save_config()

@@ -78,7 +78,7 @@ def _try_copy_files_to_temp_location(path):
 
 def _generate_unique_name(path, create_folder=True):
     while True:
-        random_name = "backup_"+_randomString(20)
+        random_name = "backup_" + _randomString(20)
         encrypted_path = f'{path}/{random_name}'
         if not os.path.exists(encrypted_path):
 
@@ -127,13 +127,13 @@ def _try_umount_directory(directory):
     # FIXME NEEDS WORK
     # ignores if not mounted
     # apenas faz umount se estiver mounted 
-    if _check_if_mounted(directory,CONFIG().get_config()['directories'][directory]['enc_path']):
+    if _check_if_mounted(directory, CONFIG().get_config()['directories'][directory]['enc_path']):
         p = subprocess.run(shlex.split(
-        # f'sudo {CURRENT_SCRIPT_PATH + "/utils/umount.sh"} {directory}'),
-        f' fusermount -u {directory}'),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        encoding='ascii')
+            # f'sudo {CURRENT_SCRIPT_PATH + "/utils/umount.sh"} {directory}'),
+            f' fusermount -u {directory}'),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            encoding='ascii')
 
         if p.returncode != 0:
             raise Exception(f'Error on umounting - exit code {p.returncode} - {p.stdout} - {p.stderr}')
@@ -151,9 +151,7 @@ def _generate_safe_key(size=32):
 
 
 def register_new_directory(path, mac, master_key):
-    '''
-
-
+    """
     assuming to generate key and send it
 
     check if empty
@@ -166,7 +164,7 @@ def register_new_directory(path, mac, master_key):
 
     :param path:
     :return: key
-    '''
+    """
 
     if not os.path.isdir(ENCRYPT_PATH):
         os.mkdir(ENCRYPT_PATH)
@@ -230,7 +228,7 @@ def decrypt_directory(path, mac, master_key):
         raise Exception('Directory is not in config')
 
 
-def unlock_with_device(mac,master_key):
+def unlock_with_device(mac, master_key):
     '''
     needs testing
     '''
@@ -240,10 +238,11 @@ def unlock_with_device(mac,master_key):
     for path in config['directories'].keys():
         # will try to decrypt
         try:
-            decrypt_directory(path,mac,master_key)
+            decrypt_directory(path, mac, master_key)
         except keystore.NoKeyError:
             # phone doesnt have key, try next key
             continue
+
 
 def lockdown():
     '''
@@ -256,6 +255,7 @@ def lockdown():
     for directory in config['directories'].keys():
         _try_umount_directory(directory)
 
+
 def remove_folder(path):
     '''
     DOES NOT REMOVE FOLDER, BUT REMOVES ENCRYPTION FROM FOLDER
@@ -267,9 +267,9 @@ def remove_folder(path):
         encrypted_path = config['directories'][path]['enc_path']
     else:
         return False
-    
-    if _check_if_mounted(path,encrypted_path): #if already mounted then is has permission
-        
+
+    if _check_if_mounted(path, encrypted_path):  # if already mounted then is has permission
+
         # blabbla backup
         dir_contents = os.listdir(path)
         if not len(dir_contents) == 0:
@@ -277,8 +277,8 @@ def remove_folder(path):
             temp_location = _try_copy_files_to_temp_location(path)
 
             # dismount path
-            _try_umount_directory(path) 
-            #removes encrypted folder and path
+            _try_umount_directory(path)
+            # removes encrypted folder and path
             shutil.rmtree(encrypted_path)
             shutil.rmtree(path)
 
@@ -287,7 +287,7 @@ def remove_folder(path):
 
 
         else:
-            #if empty remove all
+            # if empty remove all
             _try_umount_directory(path)
 
             shutil.rmtree(encrypted_path)
@@ -298,61 +298,64 @@ def remove_folder(path):
         return False
 
 
-
-
-
 def update_keys(mac, old_master_key, new_master_key):
     config = CONFIG().get_config()
 
     for path in config['directories'].keys():
 
-        if _check_if_mounted(path,config['directories'][path]['enc_path']): #our way of knowing if the key is right
+        if _check_if_mounted(path, config['directories'][path]['enc_path']):  # our way of knowing if the key is right
             try:
-                file_key = keystore.get_key(path,mac,old_master_key)
-    
-                #update
-                keystore.set_key(path,mac, new_master_key,file_key)
-    
+                file_key = keystore.get_key(path, mac, old_master_key)
+
+                # update
+                keystore.set_key(path, mac, new_master_key, file_key)
+
             except keystore.NoKeyError:
                 # phone doesnt have key, try next key
-                raise Exception(f"Is mounted but has no access to it! mount:{path}, enc path:{config['directories'][path]['enc_path']}")
+                raise Exception(
+                    f"Is mounted but has no access to it! mount:{path}, enc path:{config['directories'][path]['enc_path']}")
 
 
-def remove_device(mac,master_key):
+def remove_device(mac, master_key):
     config = CONFIG().get_config()
 
     for path in config['directories'].keys():
         # check if user has real key
-        if _check_if_mounted(path,config['directories'][path]['enc_path']): #our way of knowing if the key is right
+        if _check_if_mounted(path, config['directories'][path]['enc_path']):  # our way of knowing if the key is right
             try:
-                file_key = keystore.get_key(path,mac,master_key)
-    
-                #update
-                keystore.delete_key(path,mac) #thors error but should have
+                file_key = keystore.get_key(path, mac, master_key)
+
+                # update
+                keystore.delete_key(path, mac)  # thors error but should have
 
             except keystore.PasswordDeleteError:
-                raise Exception(f"Something is wrong! Have the key, but cant delete. mount:{path}, enc path:{config['directories'][path]['enc_path']},mac:{mac}")
+                raise Exception(
+                    f"Something is wrong! Have the key, but cant delete. mount:{path}, enc path:{config['directories'][path]['enc_path']},mac:{mac}")
 
 
             except keystore.NoKeyError:
                 # phone doesnt have key, try next key
-                raise Exception(f"Is mounted but has no access to it! mount:{path}, enc path:{config['directories'][path]['enc_path']},mac:{mac}")
+                raise Exception(
+                    f"Is mounted but has no access to it! mount:{path}, enc path:{config['directories'][path]['enc_path']},mac:{mac}")
 
 
-
-
-def _check_if_mounted(directory,enc_directory):
-    p = subprocess.run(shlex.split('mount'),stdout=subprocess.PIPE)
+def _check_if_mounted(directory, enc_directory):
+    p = subprocess.run(shlex.split('mount'), stdout=subprocess.PIPE)
 
     mount_devices = p.stdout.decode()
     search_mountpoint = f'cryfs@{enc_directory} on {directory}'
-    return search_mountpoint in mount_devices 
+    return search_mountpoint in mount_devices
 
-    
 
 def list_directories():
     config = CONFIG().get_config()
-    return tuple(config['directories'].keys())
+
+    dic = {}
+    print(tuple(config['directories']))
+    for e in config['directories']:
+        dic[e] = _check_if_mounted(e, config['directories'][e])
+
+    return dic
 
 
 class ErrorDecrypt(Exception):
