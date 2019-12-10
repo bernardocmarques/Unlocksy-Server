@@ -78,7 +78,7 @@ def _try_copy_files_to_temp_location(path):
 
 def _generate_unique_name(path, create_folder=True):
     while True:
-        random_name = _randomString(24)
+        random_name = "backup_"+_randomString(20)
         encrypted_path = f'{path}/{random_name}'
         if not os.path.exists(encrypted_path):
 
@@ -123,22 +123,20 @@ def _mount_directory(directory, enc_directory, key):
     # se for novo registar no config
 
 
-def _umount_directory(directory):
+def _try_umount_directory(directory):
     # FIXME NEEDS WORK
-    process = subprocess.Popen(shlex.split(
+    # ignores if not mounted
+    # apenas faz umount se estiver mounted 
+    if _check_if_mounted(directory,CONFIG().get_config()['directories'][directory]['enc_path']):
+        p = subprocess.run(shlex.split(
+        # f'sudo {CURRENT_SCRIPT_PATH + "/utils/umount.sh"} {directory}'),
         f' fusermount -u {directory}'),
         stdout=subprocess.PIPE,
-        stdin=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        universal_newlines=True,
-        bufsize=0)
+        encoding='ascii')
 
-    process.communicate()
-
-    if process.returncode != 0:
-        # probs ja encriptado
-        print(f'Error on umounting - exit code {process.returncode}')
-        print(process.stdout)
+        if p.returncode != 0:
+            raise Exception(f'Error on umounting - exit code {p.returncode} - {p.stdout} - {p.stderr}')
 
 
 def _generate_safe_password(size=32):
@@ -256,7 +254,7 @@ def lockdown():
     config = CONFIG().get_config()
 
     for directory in config['directories'].keys():
-        _umount_directory(directory)
+        _try_umount_directory(directory)
 
 def remove_folder(path):
     '''
@@ -270,7 +268,7 @@ def remove_folder(path):
     else:
         return False
     
-    if _check_if_already_mounted(path,encrypted_path): #if already mounted then is has permission
+    if _check_if_mounted(path,encrypted_path): #if already mounted then is has permission
         
         # blabbla backup
         dir_contents = os.listdir(path)
@@ -279,7 +277,7 @@ def remove_folder(path):
             temp_location = _try_copy_files_to_temp_location(path)
 
             # dismount path
-            _umount_directory(path) 
+            _try_umount_directory(path) 
             #removes encrypted folder and path
             shutil.rmtree(encrypted_path)
             shutil.rmtree(path)
@@ -290,7 +288,7 @@ def remove_folder(path):
 
         else:
             #if empty remove all
-            _umount_directory(path)
+            _try_umount_directory(path)
 
             shutil.rmtree(encrypted_path)
             shutil.rmtree(path)
@@ -308,7 +306,7 @@ def update_keys(mac, old_master_key, new_master_key):
 
     for path in config['directories'].keys():
 
-        if _check_if_already_mounted(path,config['directories'][path]['enc_path']): #our way of knowing if the key is right
+        if _check_if_mounted(path,config['directories'][path]['enc_path']): #our way of knowing if the key is right
             try:
                 file_key = keystore.get_key(path,mac,old_master_key)
     
@@ -325,7 +323,7 @@ def remove_device(mac,master_key):
 
     for path in config['directories'].keys():
         # check if user has real key
-        if _check_if_already_mounted(path,config['directories'][path]['enc_path']): #our way of knowing if the key is right
+        if _check_if_mounted(path,config['directories'][path]['enc_path']): #our way of knowing if the key is right
             try:
                 file_key = keystore.get_key(path,mac,master_key)
     
@@ -343,7 +341,7 @@ def remove_device(mac,master_key):
 
 
 
-def _check_if_already_mounted(directory,enc_directory):
+def _check_if_mounted(directory,enc_directory):
     p = subprocess.run(shlex.split('mount'),stdout=subprocess.PIPE)
 
     mount_devices = p.stdout.decode()

@@ -49,8 +49,10 @@ def test_keystore_wrong_master_key():
 	real_file_key=base64.b64encode(files_client._generate_safe_key(32)).decode()
 
 	keystore.set_key('test',mac,master_key,real_file_key)
-
-	key = keystore.get_key('test',mac,wrong_key)
+	try:
+		key = keystore.get_key('test',mac,wrong_key)
+	except keystore.NoKeyError: #might send this
+		key = None
 
 	assert key != real_file_key
 

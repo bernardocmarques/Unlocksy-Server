@@ -4,7 +4,7 @@ a differenca entre absolute paths e relative esta confusa no files client
 import pytest
 import os
 from config import CONFIG
-from files_client import _generate_safe_password,_generate_safe_key,_check_if_already_mounted
+from files_client import _generate_safe_password,_generate_safe_key,_check_if_mounted
 from files_client import *
 
 from keystore import NoKeyError
@@ -70,7 +70,7 @@ def test_decrypt_wrong_key(setup_folder):
     register_new_directory(path, mac, master_key)
 
     lockdown()
-    with pytest.raises(ErrorDecrypt):
+    with pytest.raises((ErrorDecrypt,NoKeyError)):
         decrypt_directory(path, mac, wrong_key)
     
     logging.getLogger().info(os.system(f'ls ./{setup_folder}'))
@@ -110,14 +110,14 @@ def test_if_is_mounted_True(register_new_directory_fixture):
     path,mac,master_key = register_new_directory_fixture
     enc_path = CONFIG().get_config()['directories'][path]['enc_path']
 
-    assert _check_if_already_mounted(path,enc_path) == True
+    assert _check_if_mounted(path,enc_path) == True
 
 def test_if_is_mounted_False(register_new_directory_fixture):
     path,mac,master_key = register_new_directory_fixture
     enc_path = CONFIG().get_config()['directories'][path]['enc_path']
     lockdown()
 
-    assert _check_if_already_mounted(path,enc_path) == False
+    assert _check_if_mounted(path,enc_path) == False
 
 #
 #

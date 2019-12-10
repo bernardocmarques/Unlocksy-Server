@@ -258,6 +258,9 @@ class BT_Server:
         if not self.master_key:
             self.request_master_key()
         
+        if not path: # if empty stop
+            return
+        
 
         files_client.register_new_directory(path,self.device_address,self.master_key)
 
