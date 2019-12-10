@@ -224,3 +224,58 @@ body {
   background-color: #CB6F63;
   border-color: #CB6F63;
 }
+
+.custom-control-label {
+  margin-left: 4rem;
+}
+
+.custom-control-label:before,
+.custom-control-label:after {
+  margin-left: -3.5rem;
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.custom-control-input ~ .custom-control-label::before {
+  border-color: #51636D;
+  border-width: 2px;
+  background-color: transparent;
+}
+
+.custom-control-input:checked ~ .custom-control-label::before {
+  border-color: #7D929E;
+  border-width: 3px;
+  background-color: transparent;
+}
+
+.custom-control-input:focus ~ .custom-control-label::before {
+  box-shadow: none
+}
+
+.custom-control-input:focus:not(:checked) ~ .custom-control-label::before {
+  border-color: #51636D;
+}
+
+.custom-control-input:not(:disabled):active ~ .custom-control-label::before {
+  color: transparent;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+#share {
+  width: 170px;
+  font-size: 1rem;
+  margin-left: auto;
+  margin-right: 10%;
+  border-color: #5ABA8A;
+  border-width: 2px;
+  color: #5ABA8A;
+}
+
+#share:hover,
+#share:focus,
+#share:active {
+  background-color: #5ABA8A;
+  color: #37474F;
+  box-shadow: none;
+}

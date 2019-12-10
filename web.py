@@ -47,6 +47,9 @@ def qr_code():
 def manage_folders():
     return render_template("manage-folders.html", device_name=server.device_name, is_running=server.isRunning)
 
+@app.route("/share-folders")
+def share_folders():
+    return render_template("share-folders.html", device_name=server.device_name, is_running=server.isRunning)
 
 @app.route("/add_folder", methods=["GET"])
 def add_folder():

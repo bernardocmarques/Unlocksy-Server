@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+{#        <meta http-equiv="refresh" content="5">#} <!-- fixme meter?  -->
+    <title>Share folders</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="../static/css/main.css">
+
+    <script src="https://kit.fontawesome.com/c9518678ef.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
+</head>
+<body>
+    <div id="alert-container"></div>
+
+    <div class="d-flex header justify-content-between align-items-center">
+        <!-- logo -->
+        <a class="d-inline-flex logo align-items-center p-4" href="{{ url_for('home') }}">
+            <img class="mr-3 mb-1" src="../static/assets/padlock.svg" alt="">
+            <span>Unlocksy</span>
+        </a>
+
+        <!-- server running -->
+        {% if is_running == True %}
+            <div class="d-inline-flex server-running align-items-center p-4">
+                <div class="lds-dual-ring mr-2"></div>
+                <span>Server is running...</span>
+            </div>
+        {% endif %}
+
+        <!-- server not running -->
+        {% if is_running == False %}
+            <div class="d-inline-flex server-running align-items-center p-4">
+                <span>Server not running</span>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="d-flex flex-column wrapper align-items-center justify-content-center">
+
+        <!-- devices -->
+        <div class="devices d-inline-flex justify-content-center align-items-center mb-4">
+            <!-- 1st device -->
+            {% if device_name != '' %}
+                <div class="d-inline-flex justify-content-center align-items-center connected mr-5">
+                 <img class="BT-icon" src="../static/assets/BT-green.svg" alt="">
+                    <span class="device-name ml-3">{{ device_name }}</span>
+                </div>
+            {% endif %}
+
+            {% if device_name == '' %}
+                <div class="d-inline-flex justify-content-center align-items-center disconnected mr-5">
+                    <img class="BT-icon" src="../static/assets/BT-red.svg" alt="">
+                    <span class="ml-3">Not connected</span>
+                </div>
+            {% endif %}
+
+            <!-- 2nd device -->
+            {% if device_name != '' %} <!-- FIXME change to 2nd device -->
+                <div class="d-inline-flex justify-content-center align-items-center connected">
+                 <img class="BT-icon" src="../static/assets/BT-green.svg" alt="">
+                    <span class="device-name ml-3">{{ device_name }}</span>  <!-- FIXME change to 2nd device -->
+                </div>
+            {% endif %}
+
+            {% if device_name == '' %} <!-- FIXME change to 2nd device -->
+                <div class="d-inline-flex justify-content-center align-items-center disconnected">
+                    <img class="BT-icon" src="../static/assets/BT-red.svg" alt="">
+                    <span class="ml-3">Not connected</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- folders -->
+        <ul class="list-group list-group-flush scrollbar mb-4">
+{#            {% for folder in folders %} <!-- TODO -->#}
+{#                <li class="list-group-item list-top">#}
+{#                    <span class="mr-5">Share</span>#}
+{#                    <span>Folder path</span>#}
+{#                </li>#}
+{#                <li class="list-group-item">#}
+{#                    <div class="custom-control custom-checkbox">#}
+{#                      <input type="checkbox" class="custom-control-input" id="check1">#} <!-- TODO id inscrementais -->
+{#                      <label class="custom-control-label folder-path" for="check1" onclick="showShareBtn('check1')">{{ folder_path }}</label>#}  <!-- TODO for = ids -->
+{#                    </div>#}
+{#                </li>#}
+{#            {% endfor %}#}
+
+
+            <!-- FIXME apagar isto e ficar só com aquilo em cima -->
+            <li class="list-group-item list-top">
+                <span class="mr-5">Share</span>
+                <span>Folder path</span>
+            </li>
+            <li class="list-group-item">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="check1">
+                    <label class="custom-control-label folder-path" for="check1" onclick="showShareBtn('check1')">http://www.groovestreet.com</label>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="check2">
+                    <label class="custom-control-label folder-path" for="check2" onclick="showShareBtn('check2')">http://www.groovestreet.com</label>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="check3">
+                    <label class="custom-control-label folder-path" for="check3" onclick="showShareBtn('check3')">http://www.groovestreet.com</label>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="check4">
+                    <label class="custom-control-label folder-path" for="check4" onclick="showShareBtn('check4')">http://www.groovestreet.com</label>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="check5">
+                    <label class="custom-control-label folder-path" for="check5" onclick="showShareBtn('check5')">http://www.groovestreet.com</label>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="check6">
+                    <label class="custom-control-label folder-path" for="check6" onclick="showShareBtn('check6')">http://www.groovestreet.com</label>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="check7">
+                    <label class="custom-control-label folder-path" for="check7" onclick="showShareBtn('check7')">http://www.groovestreet.com</label>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="check8">
+                    <label class="custom-control-label folder-path" for="check8" onclick="showShareBtn('check8')">http://www.groovestreet.com</label>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="check9">
+                    <label class="custom-control-label folder-path" for="check9" onclick="showShareBtn('check9')">http://www.groovestreet.com</label>
+                </div>
+            </li>
+            <!-- FIXME até aqui -->
+        </ul>
+
+        <button type="submit" id="share" class="btn btn-outline-primary invisible">Share</button>
+
+        <a class="btn btn-primary shadow my-3" href="{{ url_for('qr_code') }}">Show QR code</a>
+
+        <!-- go back -->
+        <a class="d-inline-flex go-back align-items-center mb-3" href="{{ url_for('home') }}">
+            <i class="fas fa-undo-alt mr-2"></i>
+            <span>go back</span>
+        </a>
+    </div>
+
+</body>
+<script src="../static/js/main.js"></script>
+</html>

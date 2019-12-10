@@ -48,3 +48,24 @@ function makeHttpRequest(url) {
             console.log(Http.responseText)
         }
 }
+
+let count_checkboxes = 0;
+
+function showShareBtn(id) {
+
+    let shareBtn = $('#share');
+    let checkbox = $('#' + id);
+
+    if(checkbox.hasClass("checked")) {
+        checkbox.removeClass("checked")
+        count_checkboxes--;
+    } else {
+        checkbox.addClass("checked")
+        count_checkboxes++
+    }
+
+    if(count_checkboxes === 0) shareBtn.addClass("invisible");
+    else if(count_checkboxes === 1) shareBtn.removeClass("invisible");
+
+    console.log(count_checkboxes);
+}
