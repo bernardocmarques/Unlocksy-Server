@@ -69,8 +69,8 @@
             <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('manage_devices') }}">Manage devices</a>
         {% endif %}
         <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('qr_code_normal') }}">Read QR code</a>
-        <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('manage_folders') }}">Manage folders</a>
         {% if device_name != '' %}
+            <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('manage_folders') }}">Manage folders</a>
             <a id="disconnect" class="btn btn-lg btn-primary shadow my-3" onclick="makeHttpRequest('{{ url_for('disconnect') }}'); window.location.reload()">Disconnect</a>
         {% endif %}
     </div>
