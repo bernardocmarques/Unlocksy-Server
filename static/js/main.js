@@ -43,15 +43,15 @@
 
 function makeHttpRequest(url) {
 
-        const Http = new XMLHttpRequest();
+    const Http = new XMLHttpRequest();
 
-        Http.open("GET", url);
-        Http.send();
+    Http.open("GET", url);
+    Http.send();
 
-        Http.onreadystatechange = (e) => {
-            console.log(Http.responseText);
-            window.location.reload();
-        }
+    Http.onreadystatechange = (e) => {
+        console.log(Http.responseText);
+        window.location.reload();
+    }
 }
 
 let count_checkboxes = 0;

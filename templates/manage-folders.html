@@ -76,7 +76,7 @@
                             <i class="fas fa-lock-open unlocked"></i>
                         {% endif %}
                     </button>
-                    <button> <span class="folder-path">{{ folder }}</span> </button>
+                    <button onclick="makeHttpRequest('{{ url_for("toggle_encryption") + "?path=" + folder + "&is_encrypted="}}{{ folders[folder] }} ')"> <span class="folder-path">{{ folder }}</span> </button>
                     <button class="float-right" data-toggle="modal" data-target="#removeFolderModal" onclick="setRemovePath('{{ folder }}');"> <i class="fas fa-minus remove-folder"></i> </button>
                 </li>
             {% endfor %}

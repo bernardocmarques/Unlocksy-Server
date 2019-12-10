@@ -281,6 +281,17 @@ class BT_Server:
 
         files_client.register_new_directory(path, self.device_address, self.master_key)
 
+    def toggle_encryption(self, path, is_encrypted):
+        print("encrypted" if is_encrypted else "decrypted")
+        if is_encrypted:
+            print("trying to decrypt")
+            if not self.master_key:
+                self.request_master_key()
+            files_client.decrypt_directory(path, self.device_address, self.master_key)
+        else:
+            print("trying to encrypt")
+            files_client._try_umount_directory(path)
+
     def list_folders(self):
         if not self.master_key:
             self.request_master_key()

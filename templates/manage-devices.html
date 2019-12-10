@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <meta http-equiv="refresh" content="5">
+    <meta http-equiv="refresh" content="5">
     <title>Manage devices</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -62,8 +62,8 @@
 
         <!-- buttons -->
         {% if device_name != '' %}
-        <button class="btn btn-lg btn-primary shadow my-3" type="button" onclick="makeHttpRequest('{{ url_for('remove_device') }}');">Revoke Device</button>
-        <button class="btn btn-lg btn-primary shadow my-3" type="button" onclick="makeHttpRequest('{{ url_for('update_keys') }}');">Update Device Keys</button>
+        <button class="btn btn-lg btn-primary shadow my-3" type="button" onclick="makeHttpRequest('{{ url_for('remove_device') }}');">Revoke device</button>
+        <button class="btn btn-lg btn-primary shadow my-3" type="button" onclick="makeHttpRequest('{{ url_for('update_keys') }}');">Update device keys</button>
         {% endif %}
         <!-- go back -->
         <a class="d-inline-flex go-back align-items-center" href="{{ url_for('home') }}">

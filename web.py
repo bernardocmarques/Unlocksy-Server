@@ -81,14 +81,13 @@ def add_folder():
     if not folder_path:  # no folder path stop
         return "ok", 200
 
-    proceed = easygui.ccbox(f"Are you sure you want to encrypt: {folder_path}",title='Confirm path folder')
+    proceed = easygui.ccbox(f"Are you sure you want to encrypt: {folder_path}", title='Confirm path folder')
 
     if proceed:
         server.add_folder(folder_path)
         return "ok", 200
     else:
         return "ok", 200
-
 
 
 # @app.route("/add_device")
@@ -126,21 +125,32 @@ def remove_folder():
     print(f"Removing encryption from {remove_path}")
 
     if not remove_path:
-        return 'invalid path',403
+        return 'invalid path', 403
 
     resp = server.remove_folder(remove_path)
 
     if resp:
-        return 'ok',200
+        return 'ok', 200
     else:
         return 'Error on removing', 403
 
-@app.route('/test')
-def test():
+
+@app.route('/list')
+def list():
     s = ""
     for e in server.list_folders():
         s += e + "\n"
     return s, 200
+
+
+@app.route('/toggle-encryption')
+def toggle_encryption():
+    args = request.args
+    path = args.get("path")
+    is_encrypted = args.get("is_encrypted")
+
+    server.toggle_encryption(path, is_encrypted == "True")
+    return "ok", 200
 
 
 def run():
