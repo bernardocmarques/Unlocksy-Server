@@ -13,7 +13,8 @@ class CONFIG(metaclass=Singleton):
     PATH = f'{CURRENT_SCRIPT_PATH}/config.json'
 
     default_config = {
-        'directories': {}
+        'directories': {},
+        'devices':[]
     }
 
     # default_config = {

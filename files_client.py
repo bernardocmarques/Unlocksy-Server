@@ -201,6 +201,8 @@ def register_new_directory(path, mac, master_key):
 
     config = CONFIG().get_config()
     config['directories'][path] = {'enc_path': encrypted_path}
+    if mac not in config['devices']:
+        config['devices'].append(mac)
     CONFIG().set_config(config)  # update config
 
     keystore.set_key(path, mac, master_key, key)
@@ -293,9 +295,10 @@ def remove_folder(path,mac, master_key):
             shutil.rmtree(encrypted_path)
             shutil.rmtree(path)
 
+        # remove file_key from all other devices with this folder
+        _remove_keyring_from_all_macs(path)
         return True
     else:
-        print('Device does not have folder')
         return False
 
 
@@ -358,10 +361,9 @@ def _if_device_has_folder_secure(path,mac,master_key, umount=False):
         return False
 
     encrypted_path = config['directories'][path]['enc_path']
-    print(encrypted_path)
     try:
         file_key = keystore.get_key(path,mac,master_key)
-        print('if_folder_secure HAS FILE KEY')
+
         if _check_if_mounted(path,encrypted_path): #ent o device ja tem ownership
 
             if umount:
@@ -376,11 +378,9 @@ def _if_device_has_folder_secure(path,mac,master_key, umount=False):
 
             return True
     except keystore.NoKeyError:
-        print('NoKeuERROR')
         return False # nao tem a chave
 
     except ErrorDecrypt:
-        print('ErrorDecrypt')
         return False
 
 def _if_device_has_folder_insecure(path,mac,master_key):
@@ -426,3 +426,15 @@ def list_directories_device(device_mac,master_key):
 
 class ErrorDecrypt(Exception):
     pass
+
+def _remove_keyring_from_all_macs(path):
+    '''
+    insecure, needs to be sure you are allowed for it
+    '''
+    devices = CONFIG().get_config()['devices']
+
+    for mac in devices:
+        try:
+            keystore.delete_key(path,mac)
+        except keystore.PasswordDeleteError:
+            continue # device doenst have folder
