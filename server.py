@@ -273,7 +273,9 @@ class BT_Server:
         files_client.register_new_directory(path, self.device_address, self.master_key)
 
     def list_folders(self):
-        return files_client.list_directories()
+        if not self.master_key:
+            self.request_master_key()
+        return files_client.list_directories_device(self.device_address,self.master_key)
 
     def remove_folder(self, path):
         if not self.isConnected or not self.device_address:
