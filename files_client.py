@@ -256,7 +256,7 @@ def lockdown():
         _try_umount_directory(directory)
 
 
-def remove_folder(path):
+def remove_folder(path,mac, master_key):
     '''
     DOES NOT REMOVE FOLDER, BUT REMOVES ENCRYPTION FROM FOLDER
     FIXME Not TESTED
@@ -268,9 +268,9 @@ def remove_folder(path):
     else:
         return False
 
-    if _check_if_mounted(path, encrypted_path):  # if already mounted then is has permission
+    if _if_device_has_folder_secure(path,mac,master_key):  
+        # prevent hackers from removing folder
 
-        # blabbla backup
         dir_contents = os.listdir(path)
         if not len(dir_contents) == 0:
             # has files, therefore puts original files in path 
@@ -303,7 +303,8 @@ def update_keys(mac, old_master_key, new_master_key):
 
     for path in config['directories'].keys():
 
-        if _check_if_mounted(path, config['directories'][path]['enc_path']):  # our way of knowing if the key is right
+        if _if_device_has_folder_secure(path,mac,old_master_key):  
+            # secure to prevent hackers updating it, also keeps folder mounted
             try:
                 file_key = keystore.get_key(path, mac, old_master_key)
 
@@ -316,27 +317,24 @@ def update_keys(mac, old_master_key, new_master_key):
                     f"Is mounted but has no access to it! mount:{path}, enc path:{config['directories'][path]['enc_path']}")
 
 
-def remove_device(mac, master_key):
+def remove_device(mac, master_key, mac_to_remove):
+    '''
+    if you own the folder, you can remove the other owners of the folder
+    '''
     config = CONFIG().get_config()
 
     for path in config['directories'].keys():
         # check if user has real key
-        if _check_if_mounted(path, config['directories'][path]['enc_path']):  # our way of knowing if the key is right
+        if _if_device_has_folder_secure(path,mac,master_key):  
+            # since it removes keyring key we need to prevent hackers from deleting other users
             try:
-                file_key = keystore.get_key(path, mac, master_key)
-
-                # update
-                keystore.delete_key(path, mac)  # thors error but should have
+                # delete other phones
+                keystore.delete_key(path, mac_to_remove)  # thors error but should have
 
             except keystore.PasswordDeleteError:
                 raise Exception(
                     f"Something is wrong! Have the key, but cant delete. mount:{path}, enc path:{config['directories'][path]['enc_path']},mac:{mac}")
 
-
-            except keystore.NoKeyError:
-                # phone doesnt have key, try next key
-                raise Exception(
-                    f"Is mounted but has no access to it! mount:{path}, enc path:{config['directories'][path]['enc_path']},mac:{mac}")
 
 
 def _check_if_mounted(directory, enc_directory):
@@ -346,17 +344,82 @@ def _check_if_mounted(directory, enc_directory):
     search_mountpoint = f'cryfs@{enc_directory} on {directory}'
     return search_mountpoint in mount_devices
 
+def _if_device_has_folder_secure(path,mac,master_key, umount=False):
+    '''
+    It makes sure device really has folder
+    -> always mounts device
+    -> umount(bool) -> for umounting
+    '''
+
+    config = CONFIG().get_config()
+    
+    if path not in config['directories'].keys():
+        return False
+
+    encrypted_path = config['directories'][path]
+
+    try:
+        file_key = keystore.get_key(path,mac,master_key)
+
+        if _check_if_mounted(path,encrypted_path): #ent o device ja tem ownership
+
+            if umount:
+                _try_umount_directory(path)
+
+            return True
+        else: # tenta abrir se der ent tem
+            _mount_directory(path,encrypted_path,file_key)
+
+            if umount:
+                _try_umount_directory(path)
+
+            return True
+    except keystore.NoKeyError:
+        return False # nao tem a chave
+
+    except ErrorDecrypt:
+        return False
+
+def _if_device_has_folder_insecure(path,mac,master_key):
+    '''
+    only verifies if in keyring
+    (Fast, does not mount)
+    '''
+
+    config = CONFIG().get_config()
+    
+    if path not in config['directories'].keys():
+        return False
+
+    encrypted_path = config['directories'][path]
+
+    try:
+        file_key = keystore.get_key(path,mac,master_key)
+        return True
+    except keystore.NoKeyError:
+        return False # nao tem a chave
+
+
 
 def list_directories():
     config = CONFIG().get_config()
 
     dic = {}
-    print(tuple(config['directories']))
-    for e in config['directories']:
-        dic[e] = _check_if_mounted(e, config['directories'][e])
+    for directory in config['directories'].keys():
+        dic[directory] = _check_if_mounted(directory, config['directories'][directory])
 
     return dic
 
+def list_directories_device(device_mac,master_key):
+    config = CONFIG().get_config()
+
+    dic = {}
+    print(tuple(config['directories']))
+    for directory in config['directories'].keys():
+        if _if_device_has_folder_insecure(directory,device_mac,master_key):
+            dic[directory] = _check_if_mounted(directory, config['directories'][directory])
+
+    return dic
 
 class ErrorDecrypt(Exception):
     pass
