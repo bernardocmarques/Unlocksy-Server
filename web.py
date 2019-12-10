@@ -4,6 +4,11 @@ from flask import Flask, render_template, request, send_file, url_for
 from server import BT_Server
 from flask_qrcode import QRcode
 
+import time
+
+import tkinter as tk
+from tkinter import filedialog
+
 from RSA_Util import *
 from bluetooth import *
 
@@ -23,6 +28,7 @@ def home():
 @app.route("/manage-devices")
 def manage_devices():
     return render_template("manage-devices.html", device_name=server.device_name, is_running=server.isRunning)
+
 
 def get_mac():
     import subprocess
@@ -55,20 +61,21 @@ def qr_code_share():
 
 @app.route("/manage-folders")
 def manage_folders():
-    return render_template("manage-folders.html", device_name=server.device_name, is_running=server.isRunning, folders=server.list_folders())
+    return render_template("manage-folders.html", device_name=server.device_name, is_running=server.isRunning,
+                           folders=server.list_folders())
+
 
 @app.route("/share-folders")
 def share_folders():
     return render_template("share-folders.html", device_name=server.device_name, is_running=server.isRunning)
 
+
 @app.route("/add_folder", methods=["GET"])
 def add_folder():
-    import tkinter as tk
-    from tkinter import filedialog
+    print("fdsfdassadf")
 
     root = tk.Tk()
     root.withdraw()
-
     folder_path = filedialog.askdirectory()
     root.destroy()
 
@@ -77,7 +84,8 @@ def add_folder():
 
     server.add_folder(folder_path)
 
-    return "ok", 200
+    time.sleep(5)
+    return manage_folders()
 
 
 @app.route("/add_device")
@@ -104,9 +112,10 @@ def remove_device():
     server.remove_device()
     return "ok", 200
 
+
 @app.route('/test')
 def test():
-    s=""
+    s = ""
     for e in server.list_folders():
         s += e + "\n"
     return s, 200

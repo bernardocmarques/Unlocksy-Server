@@ -62,12 +62,12 @@
 
         <!-- folders -->
         <ul class="list-group list-group-flush scrollbar mb-4">
-            {% for folder in folders %} <!-- TODO -->
-                <li class="list-group-item list-top">
+            <li class="list-group-item list-top">
                     <span class="mr-5">State</span>
                     <span>Folder path</span>
                     <span class="float-right">Remove</span>
-                </li>
+            </li>
+            {% for folder in folders %} <!-- TODO -->
                 <li class="list-group-item">
                     <button class="mr-5">
                         {% if folders[folder] %}
@@ -156,7 +156,7 @@
             <!-- FIXME até aqui -->
         </ul>
 
-        <a class="btn btn-primary shadow my-3" href="#" onclick="makeHttpRequest('{{ url_for('add_folder') }}');window.location.reload();">Add folder</a>
+        <a class="btn btn-primary shadow my-3" href="#" onclick="makeHttpRequest('{{ url_for('add_folder') }}')">Add folder</a>
 
         <!-- go back -->
         <a class="d-inline-flex go-back align-items-center mb-3" href="{{ url_for('home') }}">

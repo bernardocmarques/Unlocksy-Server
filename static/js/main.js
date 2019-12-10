@@ -46,6 +46,7 @@ function makeHttpRequest(url) {
 
         Http.onreadystatechange = (e) => {
             console.log(Http.responseText)
+            window.location.reload()
         }
 }
 
