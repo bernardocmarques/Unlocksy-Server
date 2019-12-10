@@ -156,8 +156,9 @@
             <!-- FIXME até aqui -->
         </ul>
 
-        <a class="btn btn-primary shadow my-3" href="#" onclick="makeHttpRequest('{{ url_for('add_folder') }}')">Add folder</a>
+        <button type="submit" id="share" class="btn btn-outline-primary" onclick="makeHttpRequest('{{ url_for('unlock_all_folders') }}')">Unlock all</button>
 
+        <a class="btn btn-primary shadow my-3" href="#" onclick="makeHttpRequest('{{ url_for('add_folder') }}')">Add folder</a>
         <!-- go back -->
         <a class="d-inline-flex go-back align-items-center mb-3" href="{{ url_for('home') }}">
             <i class="fas fa-undo-alt mr-2"></i>

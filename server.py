@@ -173,6 +173,7 @@ class BT_Server:
         self.lockdown()
 
     def unlock_folders(self):
+        print('UNLOCK ALL FOLDERS')
         self.request_master_key()
         files_client.unlock_with_device(self.device_address, self.master_key)
 
@@ -198,7 +199,7 @@ class BT_Server:
         self.server_socket, self.client_socket = self.create_server()
 
         # start thread to unlock folders
-        threading.Thread(target=self.unlock_folders).start()
+        # threading.Thread(target=self.unlock_folders).start()
         # threading.Thread(target=self.accept_second_device).start()
 
         while self.isRunning:
@@ -225,7 +226,7 @@ class BT_Server:
                 files_client.lockdown()
 
                 self.server_socket, self.client_socket = self.create_server()
-                threading.Thread(target=self.unlock_folders).start()
+                # threading.Thread(target=self.unlock_folders).start()
             except KeyboardInterrupt:
                 self.isConnected = False
                 self.isRunning = False

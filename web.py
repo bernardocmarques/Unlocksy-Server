@@ -97,6 +97,11 @@ def add_folder():
 #     server.add_device()
 #     return "ok", 200
 
+@app.route('/unlock_all_folders')
+def unlock_all_folders():
+    server.unlock_folders()
+    return "ok",200
+
 
 @app.route('/disconnect')
 def disconnect():
