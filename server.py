@@ -10,6 +10,7 @@ import threading
 from BluetoothMessage import BluetoothMessage
 
 import files_client
+import keystore  # fixme change if esteves creates new function
 
 
 class Lockdown(Exception):
@@ -301,6 +302,15 @@ class BT_Server:
             self.request_master_key()
         return files_client.list_directories_device(self.device_address, self.master_key)
 
+    def share_folder(self, path):
+        if not self.master_key:
+            self.request_master_key()
+        if self.device_address_to_share is None or self.share_device_key is None:
+            print("Error: Can't get information to share folder")
+            return
+        print(path, self.device_address, self.master_key, self.device_address_to_share, self.share_device_key, sep="\n->")
+        keystore.share_keys(path, self.device_address, self.master_key, self.device_address_to_share, self.share_device_key)  # fixme change if Esteves creates new function
+
     def remove_folder(self, path):
         if not self.isConnected or not self.device_address:
             raise DeviceNotConnected()
@@ -338,8 +348,6 @@ class BT_Server:
             print("SCA - Send Challenge Answer\n")
             self.challenge_answer = args[0]
 
-        elif cmd == "ola":
-            print(" ".join(cmd_splited))
         else:
             print("Unknown command")
             print(" ".join(cmd_splited))
@@ -382,10 +390,10 @@ class BT_Server:
             self.device_name_to_share = lookup_name(self.device_address_to_share)
 
             key_enc = client_sock_second.recv(2048).decode()
-            self.share_device_key = self.rsa.decrypt_msg(key_enc)
+            self.share_device_key = base64.b64decode(self.rsa.decrypt_msg(key_enc).decode())
 
             if self.share_device_key:
-                print("got this key boy -> " + self.share_device_key.decode())
+                print(f"Share key -> {self.share_device_key}")
             else:
                 print("Could not get share device key")
                 client_sock_second.close()

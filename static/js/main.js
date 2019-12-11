@@ -103,5 +103,5 @@ function shareFolders() {
 
     }
 
-    makeHttpRequest("/share-folders-list?" + selectedFolders);
+    makeHttpRequest("/share-folders-list?list=" + selectedFolders);
 }

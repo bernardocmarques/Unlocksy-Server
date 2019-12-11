@@ -82,8 +82,11 @@ def wait_for_share():
 @app.route("/share-folders-list")
 def share_folders_list():
     args = request.args
-    list_str = args.get("list")
-    print(list_str)
+    folders_str = args.get("list")
+    folders = folders_str.split(",")[:-1]
+
+    for folder in folders:
+        server.share_folder(folder)
     return "ok", 200
 
 

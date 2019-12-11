@@ -87,7 +87,7 @@
             {% for folder in folders %}
                 <li class="list-group-item">
                     <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" id="{{ loop.index }}"> <!-- TODO id inscrementais -->
+                      <input type="checkbox" class="custom-control-input" id="{{ loop.index }}"> <!-- id inscrementais -->
                       <label class="custom-control-label folder-path checkbox_share" for="{{ loop.index }}" onclick="showShareBtn('{{ loop.index }}')">{{ folder }}</label>  <!-- TODO for = ids -->
                     </div>
                 </li>
