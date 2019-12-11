@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta http-equiv="refresh" content="5">
+{#    <meta http-equiv="refresh" content="5">#} <!-- fixme colocar de novo -->
     <title>Homepage</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -72,6 +72,13 @@
             <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('manage_folders') }}">Manage folders</a>
             <a id="disconnect" class="btn btn-lg btn-primary shadow my-3" onclick="makeHttpRequest('{{ url_for('disconnect') }}');">Disconnect</a>
         {% endif %}
+
+        <!-- toggle proximity -->
+        <div class="custom-control custom-switch custom-control-left mt-3" id="proximity">
+            <input type="checkbox" class="custom-control-input" id="switch">
+            <label class="custom-control-label" for="switch">Proximity</label>
+        </div>
+</div>
     </div>
     
 </body>

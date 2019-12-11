@@ -60,10 +60,15 @@ def qr_code_share():
                            is_running=server.isRunning)
 
 
+@app.route("/folder-manager")
+def folder_manager():
+    return render_template("folder-manager.html", device_name=server.device_name, is_running=server.isRunning,
+                           folders=server.list_folders())
+
+
 @app.route("/manage-folders")
 def manage_folders():
-    return render_template("manage-folders.html", device_name=server.device_name, is_running=server.isRunning,
-                           folders=server.list_folders())
+    return render_template("manage-folders.html", device_name=server.device_name, is_running=server.isRunning)
 
 
 @app.route("/share-folders")

@@ -11,6 +11,8 @@ key
 
 encrypted/
 
+/venv/
+
 utils/
 
 config2.json
