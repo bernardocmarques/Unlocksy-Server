@@ -27,11 +27,10 @@ def home():
                            proximity=server.isProximityActivated)
 
 
-@app.route("/update_proximity", methods=["POST"])
+@app.route("/update-proximity", methods=["GET"])
 def update_proximity():
-    server.isProximityActivated = True if request.form.get('proximity') == 'True' else False
-    print("Proximity enabled!") if server.isProximityActivated is True else print("Proximity disabled")
-    home()
+    server.isProximityActivated = request.args.get('proximity') == 'true'
+    print("Proximity enabled!") if server.isProximityActivated else print("Proximity disabled")
     return "ok", 200
 
 

@@ -1,4 +1,5 @@
-function makeHttpRequest(url) {
+function makeHttpRequest(url, refresh) {
+   refresh = (typeof refresh !== 'undefined') ? refresh : true;
 
     const Http = new XMLHttpRequest();
 
@@ -7,21 +8,9 @@ function makeHttpRequest(url) {
 
     Http.onreadystatechange = (e) => {
         console.log(Http.responseText);
-        window.location.reload();
+
+        if(refresh) window.location.reload();
     }
-}
-
-
-function makeHttpRequestForProximity(url) {
-
-    let proximityValue = !$('#proximityToggle')[0].checked;
-    const Http = new XMLHttpRequest();
-
-    Http.open("POST", url);
-    Http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-    if(proximityValue === true) Http.send("proximity=True");
-    else Http.send("proximity=False");
 }
 
 

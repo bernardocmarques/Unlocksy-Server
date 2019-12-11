@@ -82,7 +82,9 @@
                     {% else %}
                         <input class="custom-switch-input" id="proximityToggle" type="checkbox">
                     {% endif %}
-                    <label class="custom-switch-btn" for="proximityToggle" onclick="makeHttpRequestForProximity('{{ url_for('update_proximity') }}');"></label>
+{#                    <label class="custom-switch-btn" for="proximityToggle" onclick="makeHttpRequestForProximity('{{ url_for('update_proximity') }}');"></label>#}
+                    <label class="custom-switch-btn" for="proximityToggle" onclick="makeHttpRequest('{{ url_for('update_proximity') }}' + '?proximity=' + !$('#proximityToggle')[0].checked, false);"></label>
+
                 </div>
                 <span>Proximity</span>
             </div>
