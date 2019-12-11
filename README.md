@@ -1,12 +1,6 @@
 # bluetoothTest
 
-
-sudo apt-get install cryfs # because I just want to Cry 
-
-
-sudo apt-get install bluetooth libbluetooth-dev
-sudo apt install bluez
-
+sudo apt-get install bluetooth libbluetooth-dev bluez cryfs gcc
 
 modifying /etc/systemd/system/dbus-org.bluez.service,
 
@@ -18,16 +12,25 @@ into
 
 ExecStart=/usr/lib/bluetooth/bluetoothd -C
 
-Then adding the Serial Port Profile, executing: sudo sdptool add SP
 
 Make sure you run the following after doing this:
 
-sudo usermod -G bluetooth -a USERNAME
+sudo usermod -G bluetooth -a $USERNAME
 
 sudo sdptool add SP
+sudo systemctl daemon-reload
+sudo systemctl restart bluetooth
+
 sudo chgrp bluetooth /var/run/sdp
 sudo systemctl daemon-reload
 
+(You might need to restart the computer for bluetooth to be in users groups)
 Do this everytime before running the script (or make it start on boot)
 sudo chgrp bluetooth /var/run/sdp
-sudo systemctl daemon-reload
+
+To install python requirements
+pip install -r requirements.txt
+
+
+
+To run the program you should use at least python 3.6, chrome and linux(tested on Ubuntu)

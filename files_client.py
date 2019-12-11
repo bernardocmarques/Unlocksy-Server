@@ -176,7 +176,7 @@ def register_new_directory(path, mac, master_key):
         raise Exception('Already EXISTS')
 
     # file key must be a string
-    key = _generate_safe_password(24)
+    key = _generate_safe_password(32)
     encrypted_path = _generate_unique_name(ENCRYPT_PATH)
 
     # FIXME pudia ser refatorizado
