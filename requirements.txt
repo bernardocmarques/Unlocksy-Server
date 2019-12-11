@@ -4,7 +4,6 @@ flask
 flask_qrcode
 keyring
 
-regex
 pytest
 
 easygui
