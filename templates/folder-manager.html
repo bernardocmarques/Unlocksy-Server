@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta http-equiv="refresh" content="5">
-    <title>Manage folders</title>
+{#        <meta http-equiv="refresh" content="5">#} <!-- fixme meter?  -->
+    <title>Folder manager</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="../static/css/main.css">
@@ -16,7 +16,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 
 </head>
-
 <body>
     <div id="alert-container"></div>
 
@@ -42,10 +41,8 @@
             </div>
         {% endif %}
     </div>
-
+        
     <div class="d-flex flex-column wrapper align-items-center justify-content-center">
-
-        <span class="device-name ml-3">{{ server_running }}</span>
 
         <!-- connected -->
         {% if device_name != None %}
@@ -63,18 +60,69 @@
             </div>
         {% endif %}
 
-        <!-- buttons -->
-        <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('folder_manager') }}">Folders' manager</a>
-        <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('share_folders') }}">Share folders</a>
+        <!-- folders -->
+        <ul class="list-group list-group-flush scrollbar mb-4">
+            <li class="list-group-item list-top">
+                    <span class="mr-5">State</span>
+                    <span>Folder path</span>
+                    <span class="float-right">Remove</span>
+            </li>
+            {% for folder in folders %} <!-- TODO -->
+                <li class="list-group-item">
+                    <button class="mr-5">
+                        {% if folders[folder] %}
+                            <i class="fas fa-lock locked"></i>
+                        {% else %}
+                            <i class="fas fa-lock-open unlocked"></i>
+                        {% endif %}
+                    </button>
+                    <button onclick="makeHttpRequest('{{ url_for("toggle_encryption") + "?path=" + folder + "&is_encrypted="}}{{ folders[folder] }} ')"> <span class="folder-path">{{ folder }}</span> </button>
+                    <button class="float-right" data-toggle="modal" data-target="#removeFolderModal" onclick="setRemovePath('{{ folder }}');"> <i class="fas fa-minus remove-folder"></i> </button>
+                </li>
+            {% endfor %}
+        </ul>
+
+        {% if folders|length != 0 %}
+            <button type="submit" id="share" class="btn btn-outline-primary" onclick="makeHttpRequest('{{ url_for('unlock_all_folders') }}')">Unlock all</button>
+        {% endif %}
+
+        <a class="btn btn-primary shadow my-3" href="#" onclick="makeHttpRequest('{{ url_for('add_folder') }}')">Add folder</a>
 
         <!-- go back -->
-        <a class="d-inline-flex go-back align-items-center mb-3" href="{{ url_for('home') }}">
+        <a class="d-inline-flex go-back align-items-center mb-3" href="{{ url_for('manage_folders') }}">
             <i class="fas fa-undo-alt mr-2"></i>
             <span>go back</span>
         </a>
     </div>
 
-</body>
+    <!-- modal -->
+    <div class="modal fade" id="removeFolderModal" tabindex="-1" role="dialog" aria-labelledby="removeFolderModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="removeFolderModalLabel">Remove folder</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Do you really want to remove this folder?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+            <button type="button" class="btn btn-primary" onclick="makeHttpRequest('{{ url_for('remove_folder') }}'+'?remove_path='+remove_path);">Yes, I want to remove</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
+</body>
 <script src="../static/js/main.js"></script>
+<script>
+    var remove_path='';
+
+    function setRemovePath(path) {
+        remove_path=path;
+    }
+</script>
 </html>

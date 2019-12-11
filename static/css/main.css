@@ -119,9 +119,10 @@ body {
   color: #CB6F63;
 }
 
-.wrapper .info span {
-  font-size: 1.2rem;
-  color: white;
+.wrapper h3 {
+  font-size: 1.5rem;
+  color: #5ABA8A;
+  font-family: quicksand-medium;
 }
 
 .wrapper .qr-code {
@@ -206,6 +207,8 @@ body {
 
 #disconnect:hover {
   cursor: pointer;
+  background-color: #b56359;
+  border-color: #b56359;
 }
 
 .modal-header {
@@ -230,38 +233,81 @@ body {
   border-color: #CB6F63;
 }
 
-.custom-control-label {
+.custom-control-left label {
+  color: white;
+  font-family: quicksand-medium, sans-serif;
+  font-size: 1.3rem;
+  padding-left: 1.8rem;
+}
+
+.custom-control-label::before {
+  border: none;
+  background-color: #bbc7ce;
+}
+
+.custom-control-input:checked~.custom-control-label::before {
+  border-color: #a0dd7c;
+  background-color: #a0dd7c;
+}
+
+.custom-control-input:focus ~ .custom-control-label::before {
+  box-shadow: none;
+}
+
+.custom-switch .custom-control-label::before {
+  width: 3rem;
+  height: 1.5rem;
+  border-radius: 100px;
+}
+
+.custom-control-label::before {
+  height: 1.1rem;
+}
+
+.custom-switch .custom-control-label::after {
+  top: 7px;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 50%;
+  background-color: white;
+}
+
+.custom-switch .custom-control-input:checked ~ .custom-control-label::after {
+  transform: translateX(1.3rem);
+}
+
+.list-group-item .custom-control-label {
   margin-left: 4rem;
 }
 
-.custom-control-label:before,
-.custom-control-label:after {
+.list-group-item .custom-control-label:before,
+.list-group-item .custom-control-label:after {
   margin-left: -3.5rem;
   width: 1.3rem;
   height: 1.3rem;
 }
 
-.custom-control-input ~ .custom-control-label::before {
+.list-group-item .custom-control-input ~ .custom-control-label::before {
   border-color: #51636D;
   border-width: 2px;
   background-color: transparent;
 }
 
-.custom-control-input:checked ~ .custom-control-label::before {
+.list-group-item .custom-control-input:checked ~ .custom-control-label::before {
   border-color: #7D929E;
   border-width: 3px;
   background-color: transparent;
 }
 
-.custom-control-input:focus ~ .custom-control-label::before {
+.list-group-item .custom-control-input:focus ~ .custom-control-label::before {
   box-shadow: none
 }
 
-.custom-control-input:focus:not(:checked) ~ .custom-control-label::before {
+.list-group-item .custom-control-input:focus:not(:checked) ~ .custom-control-label::before {
   border-color: #51636D;
 }
 
-.custom-control-input:not(:disabled):active ~ .custom-control-label::before {
+.list-group-item .custom-control-input:not(:disabled):active ~ .custom-control-label::before {
   color: transparent;
   background-color: transparent;
   border-color: transparent;
