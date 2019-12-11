@@ -265,7 +265,7 @@ body {
 }
 
 .custom-switch .custom-control-label::after {
-  top: 7px;
+  top: 0.35rem;
   width: 1.3rem;
   height: 1.3rem;
   border-radius: 50%;
@@ -273,7 +273,7 @@ body {
 }
 
 .custom-switch .custom-control-input:checked ~ .custom-control-label::after {
-  transform: translateX(1.3rem);
+  transform: translateX(1.45rem);
 }
 
 .list-group-item .custom-control-label {
