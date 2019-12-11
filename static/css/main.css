@@ -233,38 +233,38 @@ body {
   border-color: #CB6F63;
 }
 
-.custom-control-left label {
+.proximity .custom-control-left label {
   color: white;
   font-family: quicksand-medium, sans-serif;
   font-size: 1.3rem;
   padding-left: 1.8rem;
 }
 
-.custom-control-label::before {
+.proximity .custom-control-label::before {
   border: none;
   background-color: #bbc7ce;
 }
 
-.custom-control-input:checked~.custom-control-label::before {
+.proximity .custom-control-input:checked~.custom-control-label::before {
   border-color: #607D8B;
   background-color: #607D8B;
 }
 
-.custom-control-input:focus ~ .custom-control-label::before {
+.proximity .custom-control-input:focus ~ .custom-control-label::before {
   box-shadow: none;
 }
 
-.custom-switch .custom-control-label::before {
+.proximity .custom-switch .custom-control-label::before {
   width: 3rem;
   height: 1.5rem;
   border-radius: 100px;
 }
 
-.custom-control-label::before {
+.proximity .custom-control-label::before {
   height: 1.1rem;
 }
 
-.custom-switch .custom-control-label::after {
+.proximity .custom-switch .custom-control-label::after {
   top: 0.35rem;
   width: 1.3rem;
   height: 1.3rem;
@@ -272,7 +272,7 @@ body {
   background-color: white;
 }
 
-.custom-switch .custom-control-input:checked ~ .custom-control-label::after {
+.proximity .custom-switch .custom-control-input:checked ~ .custom-control-label::after {
   transform: translateX(1.45rem);
 }
 
