@@ -23,7 +23,16 @@ server = BT_Server(rsa)
 @app.route("/")
 def home():
     run()
-    return render_template("index.html", device_name=server.device_name, is_running=server.isRunning)
+    return render_template("index.html", device_name=server.device_name, is_running=server.isRunning,
+                           proximity=server.isProximityActivated)
+
+
+@app.route("/update_proximity", methods=["POST"])
+def update_proximity():
+    server.isProximityActivated = True if request.form.get('proximity') == 'True' else False
+    print("Proximity enabled!") if server.isProximityActivated is True else print("Proximity disabled")
+    home()
+    return "ok", 200
 
 
 @app.route("/manage-devices")
@@ -113,12 +122,6 @@ def add_folder():
     else:
         return "ok", 200
 
-
-# @app.route("/add_device")
-# def add_device():
-#     print("here")
-#     server.add_device()
-#     return "ok", 200
 
 @app.route('/unlock_all_folders')
 def unlock_all_folders():

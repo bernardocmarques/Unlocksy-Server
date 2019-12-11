@@ -59,6 +59,7 @@ class BT_Server:
         self.server_socket = self.client_socket = None
         self.isRunning = False
         self.isConnected = False
+        self.isProximityActivated = False
 
         self.device_address = None
         self.device_name = None
@@ -116,35 +117,41 @@ class BT_Server:
         return server_sock, client_sock
 
     def check_if_near(self):
-        nr_far = 0
-        nr_near = 0
+        nr_far = nr_near = 0
+
         while self.isConnected:
-            cmd_output = subprocess.check_output("hcitool rssi " + self.device_address, shell=True).decode()
-            rssi_eval = int(cmd_output.split(' ')[3])
-            # print("RSSI value is: " + str(rssi_eval))
+            if self.isProximityActivated:
+                cmd_output = subprocess.check_output("hcitool rssi " + self.device_address, shell=True).decode()
+                rssi_eval = int(cmd_output.split(' ')[3])
+                print("RSSI value is: " + str(rssi_eval)) #FIXME retirar isto?
 
-            if rssi_eval == 0:
-                nr_near += 1
-                if nr_near == 3 and not self.isNear:
-                    self.isNear = True
-                    print("=======================")
-                    print("DEVICE IS NEAR")
-                    print("=======================")
-                nr_far = 0
+                if rssi_eval == 0:
+                    nr_near += 1
+                    if nr_near == 10 and not self.isNear:
+                        self.isNear = True
+                        print("==========================")
+                        print("     DEVICE IS NEAR")
+                        print("==========================")
+                    nr_far = 0
 
-            elif rssi_eval == -1:
-                nr_far += 1
-                if nr_far == 3 and self.isNear:
-                    self.isNear = False
-                    print("=======================")
-                    print("DEVICE IS FAR")
-                    print("=======================")
-                nr_near = 0
+                elif rssi_eval == -1:
+                    nr_far += 1
+                    if nr_far == 10 and self.isNear:
+                        self.isNear = False
+                        print("==========================")
+                        print("      DEVICE IS FAR")
+                        print("==========================")
+                    nr_near = 0
+
+                else:
+                    print("Something went wrong when checking proximity of device.")
+
+                time.sleep(0.25)
 
             else:
-                print("Something went wrong when checking proximity of device.")
-
-            time.sleep(1)
+                # retry every 2s
+                time.sleep(2)
+                self.check_if_near()
 
     def lockdown(self):
         print("-----------------------LOCKDOWN-----------------------")

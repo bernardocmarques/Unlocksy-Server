@@ -73,16 +73,20 @@
         {% if device_name != None %}
             <a class="btn btn-lg btn-primary shadow my-3" href="{{ url_for('manage_folders') }}">Manage folders</a>
             <a id="disconnect" class="btn btn-lg btn-primary shadow my-3" onclick="makeHttpRequest('{{ url_for('disconnect') }}');">Disconnect</a>
-        {% endif %}
 
-        <!-- toggle proximity -->
-        <div class="proximity d-inline-flex mt-3">
-            <div class="custom-switch custom-switch-label-onoff pl-0">
-                <input class="custom-switch-input" id="proximityToggle" type="checkbox">
-                <label class="custom-switch-btn" for="proximityToggle" onclick="console.log(!$('#proximityToggle')[0].checked)"></label>
+            <!-- toggle proximity -->
+            <div class="proximity d-inline-flex mt-3">
+                <div class="custom-switch custom-switch-label-onoff pl-0">
+                    {% if proximity == True %}
+                        <input class="custom-switch-input" id="proximityToggle" type="checkbox" checked>
+                    {% else %}
+                        <input class="custom-switch-input" id="proximityToggle" type="checkbox">
+                    {% endif %}
+                    <label class="custom-switch-btn" for="proximityToggle" onclick="makeHttpRequestForProximity('{{ url_for('update_proximity') }}');"></label>
+                </div>
+                <span>Proximity</span>
             </div>
-            <span>Proximity</span>
-        </div>
+        {% endif %}
     </div>
     
 </body>
