@@ -246,8 +246,8 @@ body {
 }
 
 .custom-control-input:checked~.custom-control-label::before {
-  border-color: #a0dd7c;
-  background-color: #a0dd7c;
+  border-color: #607D8B;
+  background-color: #607D8B;
 }
 
 .custom-control-input:focus ~ .custom-control-label::before {
