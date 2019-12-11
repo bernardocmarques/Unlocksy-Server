@@ -252,7 +252,8 @@ def lockdown():
     config = CONFIG().get_config()
 
     for directory in config['directories'].keys():
-        _try_umount_directory(directory)
+        if _check_if_mounted(directory,config['directories'][directory]['enc_path']):
+            _try_umount_directory(directory)
 
 
 def remove_folder(path,mac, master_key):

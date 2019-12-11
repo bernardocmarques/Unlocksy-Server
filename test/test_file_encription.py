@@ -99,7 +99,7 @@ def test_remove_folder_no_access(register_new_directory_fixture):
     enc_path = CONFIG().get_config()['directories'][path]['enc_path']
     lockdown()
 
-    resp = remove_folder(path,mac,master_key)
+    resp = remove_folder(path,mac,_generate_safe_password(32))
     
     assert resp == False
     assert os.path.isdir(path)
