@@ -7,7 +7,7 @@ import math
 
 class AES_Util:
 
-    def __init__(self,key=None):
+    def __init__(self, key=None):
         if key:
             self.key = key
         else:

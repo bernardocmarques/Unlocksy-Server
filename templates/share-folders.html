@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-{#        <meta http-equiv="refresh" content="5">#} <!-- fixme meter?  -->
     <title>Share folders</title>
     <link rel="shortcut icon" type="image/png" href="../static/assets/favicon.png"/>
 
@@ -63,14 +62,14 @@
             {% endif %}
 
             <!-- 2nd device -->
-            {% if device_to_share_name != None %} <!-- FIXME change to 2nd device -->
+            {% if device_to_share_name != None %} <!-- 2nd device -->
                 <div id = "secondDevice" class="d-inline-flex justify-content-center align-items-center connected">
                  <img class="BT-icon" src="../static/assets/BT-green.svg" alt="">
-                    <span class="device-name ml-3">{{ device_to_share_name }}</span>  <!-- FIXME change to 2nd device -->
+                    <span class="device-name ml-3">{{ device_to_share_name }}</span>  <!-- 2nd device -->
                 </div>
             {% endif %}
 
-            {% if device_to_share_name == None %} <!-- FIXME change to 2nd device -->
+            {% if device_to_share_name == None %} <!-- 2nd device -->
                 <div id = "secondDevice" class="d-inline-flex justify-content-center align-items-center disconnected">
                     <img class="BT-icon" src="../static/assets/BT-red.svg" alt="">
                     <span class="ml-3">Not connected</span>
@@ -89,7 +88,7 @@
                 <li class="list-group-item">
                     <div class="custom-control custom-checkbox">
                       <input type="checkbox" class="custom-control-input" id="{{ loop.index }}"> <!-- id inscrementais -->
-                      <label class="custom-control-label folder-path checkbox_share" for="{{ loop.index }}" onclick="showShareBtn('{{ loop.index }}')">{{ folder }}</label>  <!-- TODO for = ids -->
+                      <label class="custom-control-label folder-path checkbox_share" for="{{ loop.index }}" onclick="showShareBtn('{{ loop.index }}')">{{ folder }}</label>
                     </div>
                 </li>
             {% endfor %}

@@ -162,14 +162,6 @@ def remove_folder():
         return 'Error on removing', 403
 
 
-@app.route('/list')
-def list():
-    s = ""
-    for e in server.list_folders():
-        s += e + "\n"
-    return s, 200
-
-
 @app.route('/toggle-encryption')
 def toggle_encryption():
     args = request.args

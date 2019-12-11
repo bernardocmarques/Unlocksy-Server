@@ -10,8 +10,12 @@ import threading
 from BluetoothMessage import BluetoothMessage
 
 import files_client
-import keystore  # fixme change if esteves creates new function
+import keystore
 
+
+# ##############################################################
+# ######################## Exceptions ##########################
+# ##############################################################
 
 class Lockdown(Exception):
     pass
@@ -25,35 +29,18 @@ class DeviceNotConnected(Exception):
     pass
 
 
+# ##############################################################
+# ####################### Server Class #########################
+# ##############################################################
+
 class BT_Server:
-    nonces = []
-
-    # noinspection PyBroadException
-    def validate_bluetooth_message(self, string):
-        try:
-            string_splited = string.split(",")
-            msg = string_splited[0]
-            nonce = string_splited[1]
-            t1 = int(string_splited[2]) / 1000
-            t2 = int(string_splited[3]) / 1000
-            bluetooth_message = BluetoothMessage(msg, nonce, t1, t2)
-        except Exception as e:
-            print("Exception:", e)
-            return None
-
-        if bluetooth_message.nonce in self.nonces:
-            print("Repeated Nonce")
-            return None
-        else:
-            self.nonces.append(bluetooth_message.nonce)
-            now = datetime.now()
-            return bluetooth_message.message if bluetooth_message.t1 < now < bluetooth_message.t2 else None
 
     def __init__(self, rsa):
         self.aes = AES_Util()
         self.rsa = rsa
+        self.nonces = []
 
-        self.server_name = "BluetoothChat"
+        self.server_name = "Unlocksy"
         self.server_uuid = "fa87c0d0-afac-11de-8a39-0800200c9a66"
 
         self.server_socket = self.client_socket = None
@@ -72,6 +59,10 @@ class BT_Server:
         self.isLockdown = False
         self.isNear = None
         self.master_key = None
+
+    # ##############################################################
+    # #################### Server Main Functions ###################
+    # ##############################################################
 
     def create_server(self):
         server_sock = BluetoothSocket(RFCOMM)
@@ -116,121 +107,10 @@ class BT_Server:
         threading.Thread(target=self.challenge).start()
         return server_sock, client_sock
 
-    def near_lockdown_countdown(self):
-        sec = 15
-
-        while True:
-            s = "" if sec == 1 else "s"
-            if not self.isNear and sec > 0:
-                print(f"{sec} second{s} to lockdown!")
-                time.sleep(1)
-                sec -= 1
-            elif not self.isNear:
-                self.lockdown()
-                break
-            else:
-                print("Lockdown canceled!")
-                break
-
-    def check_if_near(self):
-        nr_far = nr_near = 0
-
-        while self.isConnected:
-            if self.isProximityActivated:
-                cmd_output = subprocess.check_output("hcitool rssi " + self.device_address, shell=True).decode()
-                rssi_eval = int(cmd_output.split(' ')[3])
-                # print("RSSI value is: " + str(rssi_eval)) #FIXME retirar isto?
-
-                if rssi_eval == 0:
-                    nr_near += 1
-                    if nr_near == 10 and not self.isNear:
-                        self.isNear = True
-                        print("==========================")
-                        print("     DEVICE IS NEAR")
-                        print("==========================")
-                    nr_far = 0
-
-                elif rssi_eval == -1:
-                    nr_far += 1
-                    if nr_far == 10 and self.isNear:
-                        self.isNear = False
-                        print("==========================")
-                        print("      DEVICE IS FAR")
-                        print("==========================")
-                        threading.Thread(target=self.near_lockdown_countdown).start()
-                    nr_near = 0
-
-                else:
-                    print("Something went wrong when checking proximity of device.")
-
-                time.sleep(0.25)
-
-            else:
-                # retry every 2s
-                time.sleep(2)
-                self.check_if_near()
-
-    def lockdown(self):
-        print("-----------------------LOCKDOWN-----------------------")
-        self.client_socket.shutdown(2)
-        self.isLockdown = True
-
-        files_client.lockdown()
-
-    def request_challenge(self, challenge):
-        self.send_cmd("RCA " + str(challenge))
-        print("RCA " + str(challenge))
-
-    def challenge(self):
-        time.sleep(15)
-        nr_try = 0
-        while self.isConnected:
-            self.challenge_answer = None
-            challenge = random.randint(0, 10000000)
-            self.request_challenge(challenge)
-            time.sleep(15)
-            if self.challenge_answer is None or not int(self.challenge_answer) == challenge + 1:
-                nr_try += 1
-                print("wrong challenge answer (" + str(nr_try) + ")")
-                if nr_try == 3:
-                    self.lockdown()
-                    break
-            else:
-                nr_try = 0
-
-    def disconnect(self):
-        self.lockdown()
-
-    def unlock_folders(self):
-        print('UNLOCK ALL FOLDERS')
-        if not self.master_key:
-            self.request_master_key()
-        files_client.unlock_with_device(self.device_address, self.master_key)
-
-    def update_keys(self):
-        old_master_key = self.master_key
-
-        # ask for new key
-        self.request_generate_new_master_key()
-
-        files_client.update_keys(self.device_address, old_master_key, self.master_key)
-
-    def remove_device(self):
-
-        msg = "Which phone mac address do you want to revoke?\nPlease pick a mac address:"
-        title = "Choose mac address to revoke acess"
-        mac_devices = files_client.list_mac_devices()
-        choice = easygui.choicebox(msg, title, mac_devices)
-        if choice:
-            files_client.remove_device(self.device_address, self.master_key, choice)
-
     def run_server(self):
         self.isRunning = True
         self.server_socket, self.client_socket = self.create_server()
 
-        # start thread to unlock folders
-        # threading.Thread(target=self.unlock_folders).start()
-        # threading.Thread(target=self.accept_second_device).start()
 
         while self.isRunning:
             try:
@@ -268,83 +148,9 @@ class BT_Server:
         self.device_name = None
         print("Connection closed.\n\n")
 
-    def send_cmd(self, cmd):
-        bluetooth_message = BluetoothMessage(cmd)
-        self.client_socket.send(self.aes.encrypt(str(bluetooth_message)).encode())
-
-    def send_ack(self, cmd):
-        self.send_cmd("ACK " + cmd)
-
-    def add_device(self):
-        self.send_cmd("RGK")
-
-    def request_master_key(self):
-        '''
-        FIXME check if the variable should not stay in memory
-        '''
-        self.master_key = None
-        self.send_cmd("RGK")
-
-        while not self.master_key:
-            time.sleep(0.25)
-
-    def request_generate_new_master_key(self):
-        '''
-        FIXME check if the variable should not stay in memory
-        '''
-        self.master_key = None
-        self.send_cmd("RNK")
-
-        while not self.master_key:
-            time.sleep(0.25)
-
-    def add_folder(self, path):
-        if not self.isConnected or not self.device_address:
-            raise DeviceNotConnected()
-
-        if not self.master_key:
-            self.request_master_key()
-
-        if not path:  # if empty stop
-            return
-
-        files_client.register_new_directory(path, self.device_address, self.master_key)
-
-    def toggle_encryption(self, path, is_encrypted):
-        print("encrypted" if is_encrypted else "decrypted")
-        if is_encrypted:
-            print("trying to decrypt")
-            if not self.master_key:
-                self.request_master_key()
-            files_client.decrypt_directory(path, self.device_address, self.master_key)
-        else:
-            print("trying to encrypt")
-            files_client._try_umount_directory(path)
-
-    def list_folders(self):
-        if not self.master_key:
-            self.request_master_key()
-        return files_client.list_directories_device(self.device_address, self.master_key)
-
-    def share_folder(self, path):
-        if not self.master_key:
-            self.request_master_key()
-        if self.device_address_to_share is None or self.share_device_key is None:
-            print("Error: Can't get information to share folder")
-            return
-        print(path, self.device_address, self.master_key, self.device_address_to_share, self.share_device_key,
-              sep="\n->")
-        keystore.share_keys(path, self.device_address, self.master_key, self.device_address_to_share,
-                            self.share_device_key)  # fixme change if Esteves creates new function
-
-    def remove_folder(self, path):
-        if not self.isConnected or not self.device_address:
-            raise DeviceNotConnected()
-
-        if not self.master_key:
-            self.request_master_key()
-
-        return files_client.remove_folder(path, self.device_address, self.master_key)
+    # ##############################################################
+    # ############### Server Communication Functions ###############
+    # ##############################################################
 
     def execute_cmd(self, cmd):
         cmd = self.validate_bluetooth_message(cmd)
@@ -378,9 +184,212 @@ class BT_Server:
             print("Unknown command")
             print(" ".join(cmd_splited))
 
-    def stop_waiting_for_share_connection(self):
-        self.is_waiting_for_share = False
-        pass  # fixme change if no timeout
+    def validate_bluetooth_message(self, string):
+        try:
+            string_splited = string.split(",")
+            msg = string_splited[0]
+            nonce = string_splited[1]
+            t1 = int(string_splited[2]) / 1000
+            t2 = int(string_splited[3]) / 1000
+            bluetooth_message = BluetoothMessage(msg, nonce, t1, t2)
+        except Exception as e:
+            print("Exception:", e)
+            return None
+
+        if bluetooth_message.nonce in self.nonces:
+            print("Repeated Nonce")
+            return None
+        else:
+            self.nonces.append(bluetooth_message.nonce)
+            now = datetime.now()
+            return bluetooth_message.message if bluetooth_message.t1 < now < bluetooth_message.t2 else None
+
+    def send_cmd(self, cmd):
+        bluetooth_message = BluetoothMessage(cmd)
+        self.client_socket.send(self.aes.encrypt(str(bluetooth_message)).encode())
+
+    def send_ack(self, cmd):
+        self.send_cmd("ACK " + cmd)
+
+    def challenge(self):
+        time.sleep(15)
+        nr_try = 0
+        while self.isConnected:
+            self.challenge_answer = None
+            challenge = random.randint(0, 10000000)
+            self.request_challenge(challenge)
+            time.sleep(15)
+            if self.challenge_answer is None or not int(self.challenge_answer) == challenge + 1:
+                nr_try += 1
+                print("wrong challenge answer (" + str(nr_try) + ")")
+                if nr_try == 3:
+                    self.lockdown()
+                    break
+            else:
+                nr_try = 0
+
+    def request_challenge(self, challenge):
+        self.send_cmd("RCA " + str(challenge))
+        print("RCA " + str(challenge))
+
+    def request_master_key(self):
+        self.master_key = None
+        self.send_cmd("RGK")
+
+        while not self.master_key:
+            time.sleep(0.25)
+
+    def request_generate_new_master_key(self):
+        self.master_key = None
+        self.send_cmd("RNK")
+
+        while not self.master_key:
+            time.sleep(0.25)
+
+    # ##############################################################
+    # ################## Server Control Functions ##################
+    # ##############################################################
+
+    def disconnect(self):
+        self.lockdown()
+
+    def lockdown(self):
+        print("-----------------------LOCKDOWN-----------------------")
+        self.client_socket.shutdown(2)
+        self.isLockdown = True
+
+        files_client.lockdown()
+
+    def near_lockdown_countdown(self):
+        sec = 15
+
+        while True:
+            s = "" if sec == 1 else "s"
+            if not self.isNear and sec > 0:
+                print(f"{sec} second{s} to lockdown!")
+                time.sleep(1)
+                sec -= 1
+            elif not self.isNear:
+                self.lockdown()
+                break
+            else:
+                print("Lockdown canceled!")
+                break
+
+    def check_if_near(self):
+        nr_far = nr_near = 0
+
+        while self.isConnected:
+            if self.isProximityActivated:
+                cmd_output = subprocess.check_output("hcitool rssi " + self.device_address, shell=True).decode()
+                rssi_eval = int(cmd_output.split(' ')[3])
+
+                if rssi_eval == 0:
+                    nr_near += 1
+                    if nr_near == 10 and not self.isNear:
+                        self.isNear = True
+                        print("==========================")
+                        print("     DEVICE IS NEAR")
+                        print("==========================")
+                    nr_far = 0
+
+                elif rssi_eval == -1:
+                    nr_far += 1
+                    if nr_far == 10 and self.isNear:
+                        self.isNear = False
+                        print("==========================")
+                        print("      DEVICE IS FAR")
+                        print("==========================")
+                        threading.Thread(target=self.near_lockdown_countdown).start()
+                    nr_near = 0
+
+                else:
+                    print("Something went wrong when checking proximity of device.")
+
+                time.sleep(0.25)
+
+            else:
+                # retry every 2s
+                time.sleep(2)
+                self.check_if_near()
+
+    def add_folder(self, path):
+        if not self.isConnected or not self.device_address:
+            raise DeviceNotConnected()
+
+        if not self.master_key:
+            self.request_master_key()
+
+        if not path:  # if empty stop
+            return
+
+        files_client.register_new_directory(path, self.device_address, self.master_key)
+
+    def remove_folder(self, path):
+        if not self.isConnected or not self.device_address:
+            raise DeviceNotConnected()
+
+        if not self.master_key:
+            self.request_master_key()
+
+        return files_client.remove_folder(path, self.device_address, self.master_key)
+
+    def unlock_folders(self):
+        print('UNLOCK ALL FOLDERS')
+        if not self.master_key:
+            self.request_master_key()
+        files_client.unlock_with_device(self.device_address, self.master_key)
+
+    def toggle_encryption(self, path, is_encrypted):
+        print("encrypted" if is_encrypted else "decrypted")
+        if is_encrypted:
+            print("trying to decrypt")
+            if not self.master_key:
+                self.request_master_key()
+            files_client.decrypt_directory(path, self.device_address, self.master_key)
+        else:
+            print("trying to encrypt")
+            files_client._try_umount_directory(path)
+
+    def list_folders(self):
+        if not self.master_key:
+            self.request_master_key()
+        return files_client.list_directories_device(self.device_address, self.master_key)
+
+    def share_folder(self, path):
+        if not self.master_key:
+            self.request_master_key()
+        if self.device_address_to_share is None or self.share_device_key is None:
+            print("Error: Can't get information to share folder")
+            return
+        print(path, self.device_address, self.master_key, self.device_address_to_share, self.share_device_key,
+              sep="\n->")
+        keystore.share_keys(path, self.device_address, self.master_key, self.device_address_to_share,
+                            self.share_device_key)
+
+    def update_keys(self):
+        old_master_key = self.master_key
+
+        # ask for new key
+        self.request_generate_new_master_key()
+
+        files_client.update_keys(self.device_address, old_master_key, self.master_key)
+
+    def add_device(self):
+        self.send_cmd("RGK")
+
+    def remove_device(self):
+
+        msg = "Which phone mac address do you want to revoke?\nPlease pick a mac address:"
+        title = "Choose mac address to revoke acess"
+        mac_devices = files_client.list_mac_devices()
+        choice = easygui.choicebox(msg, title, mac_devices)
+        if choice:
+            files_client.remove_device(self.device_address, self.master_key, choice)
+
+    # ##############################################################
+    # ################### Share Server Functions ###################
+    # ##############################################################
 
     def wait_for_share_device_info(self):
         while not (self.device_address_to_share and self.device_address_to_share and self.share_device_key):
@@ -399,9 +408,9 @@ class BT_Server:
 
         self.is_waiting_for_share = True
         try:
-            print("Waiting device to share")  # fixme find way to timeout
+            print("Waiting device to share")
             advertise_service(self.server_socket, self.server_name,
-                              self.server_uuid)  # fixme if not connecting probs the error is where
+                              self.server_uuid)
             client_sock_second, address = self.server_socket.accept()
             stop_advertising(self.server_socket)
         except StopWaitingForShare:
@@ -411,7 +420,7 @@ class BT_Server:
             print("Error second device")
             return
 
-        if self.is_waiting_for_share:  # fixme change if no timeout
+        if self.is_waiting_for_share:
             self.device_address_to_share = address[0]
             self.device_name_to_share = lookup_name(self.device_address_to_share)
 

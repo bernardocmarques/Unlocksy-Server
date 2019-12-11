@@ -124,12 +124,10 @@ def _mount_directory(directory, enc_directory, key):
 
 
 def _try_umount_directory(directory):
-    # FIXME NEEDS WORK
     # ignores if not mounted
     # apenas faz umount se estiver mounted 
     if _check_if_mounted(directory, CONFIG().get_config()['directories'][directory]['enc_path']):
         p = subprocess.run(shlex.split(
-            # f'sudo {CURRENT_SCRIPT_PATH + "/utils/umount.sh"} {directory}'),
             f' fusermount -u "{directory}"'),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -179,7 +177,6 @@ def register_new_directory(path, mac, master_key):
     key = _generate_safe_password(24)
     encrypted_path = _generate_unique_name(ENCRYPT_PATH)
 
-    # FIXME pudia ser refatorizado
     if os.path.isdir(path):
         # blabbla backup
         dir_contents = os.listdir(path)
@@ -261,7 +258,6 @@ def lockdown():
 def remove_folder(path,mac, master_key):
     '''
     DOES NOT REMOVE FOLDER, BUT REMOVES ENCRYPTION FROM FOLDER
-    FIXME Not TESTED
     '''
     config = CONFIG().get_config()
 

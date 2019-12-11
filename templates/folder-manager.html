@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-{#        <meta http-equiv="refresh" content="5">#} <!-- fixme meter?  -->
     <title>Folder manager</title>
     <link rel="shortcut icon" type="image/png" href="../static/assets/favicon.png"/>
 
@@ -68,7 +67,7 @@
                     <span>Folder path</span>
                     <span class="float-right">Remove</span>
             </li>
-            {% for folder in folders %} <!-- TODO -->
+            {% for folder in folders %}
                 <li class="list-group-item">
                     <button class="mr-5">
                         {% if folders[folder] %}
