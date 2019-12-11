@@ -116,6 +116,22 @@ class BT_Server:
         threading.Thread(target=self.challenge).start()
         return server_sock, client_sock
 
+    def near_lockdown_countdown(self):
+        sec = 15
+
+        while True:
+            s = "" if sec == 1 else "s"
+            if not self.isNear and sec > 0:
+                print(f"{sec} second{s} to lockdown!")
+                time.sleep(1)
+                sec -= 1
+            elif not self.isNear:
+                self.lockdown()
+                break
+            else:
+                print("Lockdown canceled!")
+                break
+
     def check_if_near(self):
         nr_far = nr_near = 0
 
@@ -123,7 +139,7 @@ class BT_Server:
             if self.isProximityActivated:
                 cmd_output = subprocess.check_output("hcitool rssi " + self.device_address, shell=True).decode()
                 rssi_eval = int(cmd_output.split(' ')[3])
-                print("RSSI value is: " + str(rssi_eval)) #FIXME retirar isto?
+                # print("RSSI value is: " + str(rssi_eval)) #FIXME retirar isto?
 
                 if rssi_eval == 0:
                     nr_near += 1
@@ -141,6 +157,7 @@ class BT_Server:
                         print("==========================")
                         print("      DEVICE IS FAR")
                         print("==========================")
+                        threading.Thread(target=self.near_lockdown_countdown).start()
                     nr_near = 0
 
                 else:
@@ -315,8 +332,10 @@ class BT_Server:
         if self.device_address_to_share is None or self.share_device_key is None:
             print("Error: Can't get information to share folder")
             return
-        print(path, self.device_address, self.master_key, self.device_address_to_share, self.share_device_key, sep="\n->")
-        keystore.share_keys(path, self.device_address, self.master_key, self.device_address_to_share, self.share_device_key)  # fixme change if Esteves creates new function
+        print(path, self.device_address, self.master_key, self.device_address_to_share, self.share_device_key,
+              sep="\n->")
+        keystore.share_keys(path, self.device_address, self.master_key, self.device_address_to_share,
+                            self.share_device_key)  # fixme change if Esteves creates new function
 
     def remove_folder(self, path):
         if not self.isConnected or not self.device_address:
